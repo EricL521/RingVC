@@ -15,4 +15,7 @@ const rest = new REST({ version: '9' }).setToken(token);
 
 rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: commands })
 	.then(() => console.log('Successfully registered application commands.'))
-	.catch(console.error);
+	.catch(console.error)
+	.then(() => {
+		process.exit(); // stop node
+	});

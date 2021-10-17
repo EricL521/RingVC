@@ -4,6 +4,7 @@ const { token } = require('./config.json');
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
+// load commands
 client.commands = new Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
@@ -13,6 +14,8 @@ for (const file of commandFiles) {
 	// With the key as the command name and the value as the exported module
 	client.commands.set(command.data.name, command);
 }
+
+let {data} = require('./main/data.js');
 
 // When the client is ready, run this code (only once)
 client.once('ready', () => {
