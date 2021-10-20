@@ -34,6 +34,20 @@ class VoiceChannelFilter {
     removeUser(userId) {
         this.list.delete(userId);
     }
+
+    // clears the filter
+    clearFilter() {
+        this.list = new WatcherMap(onModify);
+    }
+
+    // sets the mode for a filter
+    // true or false for white list or black list
+    // also clears filter
+    setMode(mode) {
+        this.isWhitelist = mode;
+
+        this.clearFilter();
+    }
 }
 
 module.exports = {

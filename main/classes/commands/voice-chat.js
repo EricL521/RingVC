@@ -1,5 +1,6 @@
 // both used to notify data.js
 const {data, onModify} = require("../../data.js");
+const {WatcherMap} = require("../storage/watcher-map.js");
 
 const {DiscordUser} = require("./discord-user.js");
 
@@ -14,7 +15,7 @@ class VoiceChat {
         data.voiceChats.set(channelId, this);
 
         this.channelId = channelId;
-        this.userIds = [];
+        this.userIds = new WatcherMap(onModify);
         for (let i = 0; i < userIds.length; i ++)
             this.addUser(userIds[i]);
     }
@@ -26,15 +27,31 @@ class VoiceChat {
             new DiscordUser(userId, [
                 this.channelId
             ]);
-        this.userIds.push(userId);
+        // update userIds
+        this.userIds.set(userId, 0); // the value doesn't actually matter
+        // update discord user
+        data.users.get(userId).addVoiceChannel(this.channelId);
+    }
+
+    // removes a user
+    removeUser (userId) {
+        this.userIds.delete(userId);
+
+        data.users.get(userId).removeVoiceChannel(this.channelId);
+    }
+
+    // returns if it has the user
+    hasUser (userId) {
+        return this.userIds.has(userId);
     }
 
     // on someone joining an empty call
     // user is the person who joined the call
     onJoin (user) {
         user.client.channels.fetch(this.channelId).then(channel => {
-            for (let i = 0; i < this.userIds.length; i ++)
-                data.users.get(this.userIds[i]).ring(channel, user);
+            this.userIds.foreach((value, key, map) => {
+                data.users.get(key).ring(channel, user);
+            }); 
         });
     }
 }

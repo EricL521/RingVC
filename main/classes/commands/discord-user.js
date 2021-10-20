@@ -32,9 +32,31 @@ class DiscordUser {
         );
     }
 
+    // removes a voice channel
+    removeVoiceChannel(channelId) {
+        this.voiceChannels.delete(channelId);
+    }
+
+    // if the user has signed up for a voice channel
+    hasVoiceChannel(channelId) {
+        return this.voiceChannels.has(channelId);
+    }
+
     // get the filter for a channelId
     getFilter(channelId) {
         return this.voiceChannels.get(channelId);
+    }
+
+    // edit the filter for a channel
+    // returns and object for editing it
+    editFilter(channelId) {
+        let filter = this.getFilter(channelId);
+        return {
+            addUser: filter.addUser,
+            removeUser: filter.removeUser,
+            clearFilter: filter.clearFilter,
+            setMode: filter.setMode
+        }
     }
 
     // called when a call is started
