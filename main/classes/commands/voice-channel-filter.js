@@ -17,6 +17,16 @@ class VoiceChannelFilter {
             this.list.set(userId, 0); // value doesn't matter
     }
 
+    // return whitelist or blacklist
+    getType() {
+        return this.isWhitelist? "whitelist": "blacklist";
+    }
+
+    // return map of userIds
+    getList() {
+        return this.list;
+    }
+
     // whether or not a user passes the filter
     filter(userId) {
         let listContainsUser = this.list.has(userId);

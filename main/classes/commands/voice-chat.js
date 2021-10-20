@@ -49,7 +49,7 @@ class VoiceChat {
     // user is the person who joined the call
     onJoin (user) {
         user.client.channels.fetch(this.channelId).then(channel => {
-            this.userIds.foreach((value, key, map) => {
+            this.userIds.forEach((value, key, map) => {
                 data.users.get(key).ring(channel, user);
             }); 
         });

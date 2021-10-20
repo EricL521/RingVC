@@ -47,18 +47,6 @@ class DiscordUser {
         return this.voiceChannels.get(channelId);
     }
 
-    // edit the filter for a channel
-    // returns and object for editing it
-    editFilter(channelId) {
-        let filter = this.getFilter(channelId);
-        return {
-            addUser: filter.addUser,
-            removeUser: filter.removeUser,
-            clearFilter: filter.clearFilter,
-            setMode: filter.setMode
-        }
-    }
-
     // called when a call is started
     // channel: discordjs object of the channel the person joined
     // startedUser: discordjs object of the person who started the call
