@@ -2,7 +2,10 @@ const fs = require('fs');
 const { Client, Collection, Intents } = require('discord.js');
 const { token } = require('./config.json');
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const client = new Client({ intents: [
+	Intents.FLAGS.GUILDS,
+	Intents.FLAGS.GUILD_VOICE_STATES
+] });
 
 // load commands
 client.commands = new Collection();
@@ -15,6 +18,8 @@ for (const file of commandFiles) {
 	client.commands.set(command.data.name, command);
 }
 
+
+// data is updated basically in every file
 let {data} = require('./main/data.js');
 
 // When the client is ready, run this code (only once)
@@ -35,6 +40,15 @@ client.on('interactionCreate', async interaction => {
 		console.error(error);
 		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 	}
+});
+
+client.on('voiceStateUpdate', (oldState, newState) => {
+	// newstate exists
+	// and if the channel has 1 person in it now
+	// and if anyone has signed up for it=
+	// for some reason newState can have no channel, so
+	if (newState && newState.channel && newState.channel.members.size === 1 && data.voiceChats.has(newState.channelId)) 
+		data.voiceChats.get(newState.channelId).onJoin(newState.member.user);
 });
 
 // Login to Discord with your client's token

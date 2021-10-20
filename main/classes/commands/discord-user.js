@@ -1,70 +1,66 @@
-const {onModify} = require("../../data.js");
+// used for permission flags
+const {Permissions} = require("discord.js");
+
+// both used to notify data.js
+const {data, onModify} = require("../../data.js");
 const {WatcherMap} = require("../storage/watcher-map.js");
 
-// class for a discord user
+const {VoiceChannelFilter} = require("./voice-channel-filter.js");
+
+// class that represents a discord user with it's filters and such
 class DiscordUser {
     /*
         userId is the user id
-        voiceChannels is an array of {guildId, channelId}
+        voiceChannels is an array of channelIds
     */
-    constructor (voiceChannels) {
+    constructor (userId, voiceChannels) {
+        // update userMap
+        data.users.set(userId, this);
+
+        this.userId = userId;
         // voice channels is a map with key guildID and values a map of channelIds
         this.voiceChannels = new WatcherMap(onModify);
         for (let i = 0; i < voiceChannels.length; i ++) {
-            let voiceChannel = voiceChannels[i];
-            console.log(voiceChannel);
-            if (!this.voiceChannels.has(voiceChannel.guildId))
-                this.voiceChannels.set(voiceChannel.guildId, new WatcherMap(onModify));
-            
-            this.voiceChannels.get(voiceChannel.guildId).set(
-                voiceChannel.channelId, new VoiceChannelFilter(false, [])
-            );
+            this.addVoiceChannel(voiceChannels[i]);
         }
     }
 
     // adds a voice channel
-    addVoiceChannel(guildId, channelId) {
-        if (!this.voiceChannels.has(guildId))
-                this.voiceChannels.set(guildId, new WatcherMap(onModify));
-        
-        this.voiceChannels.get(guildId).set(
+    addVoiceChannel(channelId) {
+        this.voiceChannels.set(
             channelId, new VoiceChannelFilter(false, [])
         );
     }
-}
 
-// class for whitelist or blacklist
-class VoiceChannelFilter {
-    /* 
-        isWhitelist is a boolean
-        list is the whitelist or blacklist
-        list is an array of userIds
-    */
-    constructor(isWhitelist, list) {
-        this.isWhitelist = isWhitelist;
-
-        this.list = new WatcherMap(onModify);
-        for (let userId in list)
-            this.list.set(userId, 0); // value doesn't matter
+    // get the filter for a channelId
+    getFilter(channelId) {
+        return this.voiceChannels.get(channelId);
     }
 
-    // whether or not a user passes the filter
-    filter(userId) {
-        let listContainsUser = this.list.has(userId);
+    // called when a call is started
+    // channel: discordjs object of the channel the person joined
+    // startedUser: discordjs object of the person who started the call
+    // message is optional
+    // placed in between the username and the invite
+    async ring (channel, startedUser, message) {
+        // if user can join channel
+        if (channel.permissionsFor(this.userId).has(Permissions.FLAGS.CONNECT)) {
+            let filter = this.getFilter(channel.id);
+            let user = await channel.client.users.fetch(this.userId);
+            
+            // if filter doesn't exist that means that the user is not registered for the channel yet
+            // so someone is ringing them (with ring command)
+            if (!filter || filter.filter(startedUser.id)) {
+                let dm = await user.createDM();
+                let invite = await channel.createInvite({maxUses: 1})
+                dm.send({
+                    content: `${user}, ${startedUser.username} ${message? message: "just joined"} ${invite}`
+                });
+            }
+        }
 
-        // ^ is xor
-        return !(this.isWhitelist ^ listContainsUser);
     }
 
-    // adds a user to the filter
-    addUser(userId) {
-        this.list.set(userId, 0);
-    }
-
-    // removes a user from the filter
-    removeUser(userId) {
-        this.list.delete(userId);
-    }
 }
 
 module.exports = {

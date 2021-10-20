@@ -1,6 +1,9 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const voice = require('@discordjs/voice');
 
+const {data} = require('../main/data.js');
+const {DiscordUser} = require('../main/classes/commands/discord-user.js');
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('ring')
@@ -11,10 +14,9 @@ module.exports = {
                 .setRequired(true)),
 	async execute(interaction) {
         const user = interaction.options.getUser('user');
-        let inviteLink = null;
-        if (interaction.member.voice.channel)
-            inviteLink = await interaction.member.voice.channel.createInvite({maxUses: 1});
-        else {
+        const channel = interaction.member.voice.channel;
+        // if channel doesn't exist (user not in call)
+        if (!channel) {
             // don't send dm
             await interaction.reply({
                 content: `Please join a vc first`,
@@ -23,21 +25,15 @@ module.exports = {
             return;
         }
         
+        // if the user has no object yet
+        if (!data.users.has(user.id))
+            new DiscordUser(user.id, []);
+
         // send the user an invite link to the voice channel or text channel that the interaction creator is in
-        (await user.createDM()).send({
-            content: `${user}, ${interaction.user.username} wants you to join them at ${inviteLink}`
-        });
-        // bot can't call in a dm yet, so
-        // voice.joinVoiceChannel({
-        //     channelId: user.dmChannel.id,
-        //     guildId: "@me",
-        //     selfMute: true,
-        //     selfDeaf: true,
-        //     adapterCreator: interaction.guild.voiceAdapterCreator
-        // });
+        data.users.get(user.id).ring(channel, interaction.user, "wants you to join");
 
 		await interaction.reply({
-            content: `Ringing ${user.username}`,
+            content: `Notified ${user.username}`,
             ephemeral: true
         });
 	},

@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-let {data} = require('../main/data.js');
-const {DiscordUser} = require('../main/classes/commands/discord-user.js');
+const {VoiceChat} = require('../main/classes/commands/voice-chat.js');
+
+const {data} = require('../main/data.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -12,23 +13,15 @@ module.exports = {
                 .setRequired(true)),
 	async execute(interaction) {
         const channel = interaction.options.getChannel('channel');
-        const userId = interaction.user.id;
-        // update or create discorduser
-        let discordUser = null;
-        if (data.has(userId)) {
-            discordUser = data.get(userId);
-            console.log(discordUser);
-            discordUser.addVoiceChannel(interaction.guildId, channel.id);
+        const user = interaction.user;
+        // update or create voice chat object
+        let voiceChat = null;
+        if (data.voiceChats.has(channel.id)) {
+            voiceChat = data.voiceChats.get(channel.id);
+            voiceChat.addUser(user.id);
         }
         else
-            discordUser = new DiscordUser([
-                {
-                    guildId: interaction.guildId,
-                    channelId: channel.id
-                }
-            ]);
-        // update data
-        data.set(userId, discordUser);
+            new VoiceChat(channel.id, [user.id]);
         
         interaction.reply({
             content: `Signed up for <#${channel.id}>`,

@@ -5,6 +5,8 @@ const {saveInterval} = require("../config.json");
 // import watchermap
 const {WatcherMap} = require("./classes/storage/watcher-map.js");
 
+// import the maps of the 3 classes
+
 // whether or not the data has been modified
 // if it hasn't, won't write to data.json
 let modified = false;
@@ -12,7 +14,10 @@ const onModify = () => {
     modified = true;
 }
 
-let data = new WatcherMap(onModify, null);
+let data = {
+    voiceChats: new WatcherMap(onModify, null),
+    users: new WatcherMap(onModify, null),
+};
 
 module.exports = {
     data: data,
