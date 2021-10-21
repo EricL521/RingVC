@@ -17,22 +17,38 @@ class VoiceChannelFilter {
             this.list.set(userId, 0); // value doesn't matter
     }
 
-    // return whitelist or blacklist
-    getType() {
-        return this.isWhitelist? "whitelist": "blacklist";
-    }
-
-    // return map of userIds
-    getList() {
-        return this.list;
-    }
-
     // whether or not a user passes the filter
     filter(userId) {
         let listContainsUser = this.list.has(userId);
 
         // ^ is xor
         return !(this.isWhitelist ^ listContainsUser);
+    }
+    
+
+    // return whitelist or blacklist
+    getType() {
+        return this.isWhitelist? "whitelist": "blacklist";
+    }
+
+    // sets the mode for a filter
+    // string "whitelist" or "blacklist", defaults to blacklist
+    // also clears filter
+    setType(type) {
+        this.isWhitelist = (type === "whitelist")? true: false;
+
+        this.clearFilter();
+    }
+
+    // clears the filter
+    clearFilter() {
+        this.list = new WatcherMap(onModify);
+    }
+
+
+    // return map of userIds
+    getList() {
+        return this.list;
     }
 
     // adds a user to the filter
@@ -43,20 +59,6 @@ class VoiceChannelFilter {
     // removes a user from the filter
     removeUser(userId) {
         this.list.delete(userId);
-    }
-
-    // clears the filter
-    clearFilter() {
-        this.list = new WatcherMap(onModify);
-    }
-
-    // sets the mode for a filter
-    // true or false for white list or black list
-    // also clears filter
-    setMode(mode) {
-        this.isWhitelist = mode;
-
-        this.clearFilter();
     }
 }
 
