@@ -1,6 +1,10 @@
 // both used to notify data.js
-const {onModify} = require("../../data.js");
 const {WatcherMap} = require("../storage/watcher-map.js");
+const onModifyFunctions = [];
+const onModify = () => {
+    for (let i = 0; i < onModifyFunctions.length; i ++)
+        onModifyFunctions[i]();
+};
 
 // class for whitelist or blacklist
 class VoiceChannelFilter {
@@ -13,8 +17,9 @@ class VoiceChannelFilter {
         this.isWhitelist = isWhitelist;
 
         this.list = new WatcherMap(onModify);
-        for (let userId in list)
-            this.list.set(userId, 0); // value doesn't matter
+        let listArray = Array.from(list);
+        for (let i = 0; i < listArray.length; i ++)
+            this.list.set(listArray[i], 0); // value doesn't matter
     }
 
     // whether or not a user passes the filter
@@ -38,6 +43,9 @@ class VoiceChannelFilter {
         this.isWhitelist = (type === "whitelist")? true: false;
 
         this.clearFilter();
+
+        // call on modify
+        onModify();
     }
 
     // clears the filter
@@ -63,5 +71,6 @@ class VoiceChannelFilter {
 }
 
 module.exports = {
-    VoiceChannelFilter: VoiceChannelFilter
+    VoiceChannelFilter: VoiceChannelFilter,
+    filterOnModifyFunctions: onModifyFunctions
 }

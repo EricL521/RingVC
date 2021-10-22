@@ -2,26 +2,34 @@
 const {Permissions} = require("discord.js");
 
 // both used to notify data.js
-const {data, onModify} = require("../../data.js");
+const onModifyFunctions = [];
+const onModify = () => {
+    for (let i = 0; i < onModifyFunctions.length; i ++)
+        onModifyFunctions[i]();
+};
 const {WatcherMap} = require("../storage/watcher-map.js");
 
 const {VoiceChannelFilter} = require("./voice-channel-filter.js");
 
 // class that represents a discord user with it's filters and such
 class DiscordUser {
+    static users = new WatcherMap();
+
+
     /*
         userId is the user id
         voiceChannels is an array of channelIds
     */
     constructor (userId, voiceChannels) {
         // update userMap
-        data.users.set(userId, this);
+        DiscordUser.users.set(userId, this);
 
         this.userId = userId;
         // voice channels is a map with key guildID and values a map of channelIds
         this.voiceChannels = new WatcherMap(onModify);
-        for (let i = 0; i < voiceChannels.length; i ++) {
-            this.addVoiceChannel(voiceChannels[i]);
+        let voiceChannelsArray = Array.from(voiceChannels);
+        for (let i = 0; i < voiceChannelsArray.length; i ++) {
+            this.addVoiceChannel(voiceChannelsArray[i]);
         }
     }
 
@@ -70,9 +78,9 @@ class DiscordUser {
         }
 
     }
-
 }
 
 module.exports = {
-    DiscordUser: DiscordUser
+    DiscordUser: DiscordUser,
+    userOnModifyFunctions: onModifyFunctions
 }

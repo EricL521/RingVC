@@ -1,3 +1,6 @@
+// data is updated basically in every file
+const {data} = require('./main/data.js');
+
 const fs = require('fs');
 const { Client, Collection, Intents } = require('discord.js');
 const { token } = require('./config.json');
@@ -18,9 +21,6 @@ for (const file of commandFiles) {
 	client.commands.set(command.data.name, command);
 }
 
-
-// data is updated basically in every file
-let {data} = require('./main/data.js');
 
 // When the client is ready, run this code (only once)
 client.once('ready', () => {

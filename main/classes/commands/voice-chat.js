@@ -1,43 +1,51 @@
 // both used to notify data.js
-const {data, onModify} = require("../../data.js");
+const onModifyFunctions = [];
+const onModify = () => {
+    for (let i = 0; i < onModifyFunctions.length; i ++)
+        onModifyFunctions[i]();
+};
 const {WatcherMap} = require("../storage/watcher-map.js");
 
 const {DiscordUser} = require("./discord-user.js");
 
 // class for a discord voice chat
 class VoiceChat {
+    static voiceChats = new WatcherMap();
+
+
     /*
         channel is the channel object
         userIds is an array of userIds
     */
     constructor (channelId, userIds) {
         // update channel map
-        data.voiceChats.set(channelId, this);
+        VoiceChat.voiceChats.set(channelId, this);
 
         this.channelId = channelId;
         this.userIds = new WatcherMap(onModify);
-        for (let i = 0; i < userIds.length; i ++)
-            this.addUser(userIds[i]);
+        let userIdsArray = Array.from(userIds);
+        for (let i = 0; i < userIdsArray.length; i ++)
+            this.addUser(userIdsArray[i]);
     }
 
     // add a user
     addUser (userId) {
         // create new discord user if needed
-        if (!data.users.has(userId))
+        if (!DiscordUser.users.has(userId))
             new DiscordUser(userId, [
                 this.channelId
             ]);
         // update userIds
         this.userIds.set(userId, 0); // the value doesn't actually matter
         // update discord user
-        data.users.get(userId).addVoiceChannel(this.channelId);
+        DiscordUser.users.get(userId).addVoiceChannel(this.channelId);
     }
 
     // removes a user
     removeUser (userId) {
         this.userIds.delete(userId);
 
-        data.users.get(userId).removeVoiceChannel(this.channelId);
+        DiscordUser.users.get(userId).removeVoiceChannel(this.channelId);
     }
 
     // returns if it has the user
@@ -50,12 +58,13 @@ class VoiceChat {
     onJoin (user) {
         user.client.channels.fetch(this.channelId).then(channel => {
             this.userIds.forEach((value, key, map) => {
-                data.users.get(key).ring(channel, user);
+                DiscordUser.users.get(key).ring(channel, user);
             }); 
         });
     }
 }
 
 module.exports = {
-    VoiceChat: VoiceChat
+    VoiceChat: VoiceChat,
+    voiceChatOnModifyFunctions: onModifyFunctions
 }

@@ -20,5 +20,5 @@ class WatcherMap extends Map {
 }
 
 module.exports = {
-    WatcherMap: WatcherMap
+    WatcherMap
 }
