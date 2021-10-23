@@ -67,6 +67,10 @@ class VoiceChannelFilter {
         this.list.set(userId, 0);
     }
 
+    hasUser(userId) {
+        return this.list.has(userId);
+    }
+
     // removes a user from the filter
     removeUser(userId) {
         this.list.delete(userId);
