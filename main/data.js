@@ -52,13 +52,10 @@ const reviver = (key, value) => {
                 return map;
             }, new WatcherMap(onModify, null));
         else if (value.dataType === 'DiscordUser') {
-            // it's possible that Discord User has already been created!
-            if (DiscordUser.users.has(value.value.userId))
-                return DiscordUser.users.get(value.value.userId);
             return new DiscordUser(value.value.userId, value.value.voiceChannels.entries());
         }
         else if (value.dataType === 'VoiceChat')
-            return new VoiceChat(value.value.channelId, value.value.userIds.keys());
+            return new VoiceChat(value.value.channelId, value.value.userIds.keys(), true);
         else if (value.dataType === 'VoiceChannelFilter')
             return new VoiceChannelFilter(value.value.isWhitelist, value.value.list.keys());
     }

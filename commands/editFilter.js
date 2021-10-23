@@ -1,5 +1,4 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const {VoiceChat} = require('../main/classes/commands/voice-chat.js');
 
 const {data} = require('../main/data.js');
 

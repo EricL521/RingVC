@@ -16,8 +16,9 @@ class VoiceChat {
     /*
         channel is the channel object
         userIds is an array of userIds
+        if overwriteNewUsers is true, then this class will not make new users (only when creating this)
     */
-    constructor (channelId, userIds) {
+    constructor (channelId, userIds, overwriteNewUsers) {
         // update channel map
         VoiceChat.voiceChats.set(channelId, this);
 
@@ -25,18 +26,21 @@ class VoiceChat {
         this.userIds = new WatcherMap(onModify);
         let userIdsArray = Array.from(userIds);
         for (let i = 0; i < userIdsArray.length; i ++)
-            this.addUser(userIdsArray[i]);
+            this.addUser(userIdsArray[i], overwriteNewUsers);
     }
 
     // add a user
-    addUser (userId) {
-        // create new discord user if needed
-        if (!DiscordUser.users.has(userId))
-            new DiscordUser(userId, []);
+    addUser (userId, overwriteNewUsers) {
+        if (!overwriteNewUsers) {
+            // create new discord user if needed
+            if (!DiscordUser.users.has(userId))
+                new DiscordUser(userId, []);
+            // update discord user
+            DiscordUser.users.get(userId).addVoiceChannel(this.channelId);
+        }
+
         // update userIds
         this.userIds.set(userId, 0); // the value doesn't actually matter
-        // update discord user
-        DiscordUser.users.get(userId).addVoiceChannel(this.channelId);
     }
 
     // removes a user
