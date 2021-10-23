@@ -51,6 +51,9 @@ class VoiceChannelFilter {
     // clears the filter
     clearFilter() {
         this.list = new WatcherMap(onModify);
+
+        // call onmodify
+        onModify();
     }
 
 
