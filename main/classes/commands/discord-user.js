@@ -18,7 +18,7 @@ class DiscordUser {
 
     /*
         userId is the user id
-        voiceChannels is an array of channelIds
+        voiceChannels is an array of [channelIds, filter] with filter optional
     */
     constructor (userId, voiceChannels) {
         // update userMap
@@ -28,15 +28,15 @@ class DiscordUser {
         // voice channels is a map with key guildID and values a map of channelIds
         this.voiceChannels = new WatcherMap(onModify);
         let voiceChannelsArray = Array.from(voiceChannels);
-        for (let i = 0; i < voiceChannelsArray.length; i ++) {
-            this.addVoiceChannel(voiceChannelsArray[i]);
-        }
+        for (let i = 0; i < voiceChannelsArray.length; i ++) 
+            this.addVoiceChannel(voiceChannelsArray[i][0], voiceChannelsArray[i][1]);
     }
 
     // adds a voice channel
-    addVoiceChannel(channelId) {
+    // an optional filter object
+    addVoiceChannel(channelId, filter) {
         this.voiceChannels.set(
-            channelId, new VoiceChannelFilter(false, [])
+            channelId, filter? filter : new VoiceChannelFilter(false, [])
         );
     }
 
@@ -61,10 +61,14 @@ class DiscordUser {
     // message is optional
     // placed in between the username and the invite
     async ring (channel, startedUser, message) {
+        // if client is not in guild cache, get fetch from discord
+        if (!channel.guild.members.resolve(this.userId))
+            await channel.guild.members.fetch(this.userId);
+
         // if user can join channel
         if (channel.permissionsFor(this.userId).has(Permissions.FLAGS.CONNECT)) {
             let filter = this.getFilter(channel.id);
-            let user = await channel.client.users.fetch(this.userId);
+            let user = channel.client.users.resolve(this.userId);
             
             // if filter doesn't exist that means that the user is not registered for the channel yet
             // so someone is ringing them (with ring command)

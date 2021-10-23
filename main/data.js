@@ -46,17 +46,19 @@ const replacer = (key, value) => {
 };
 const reviver = (key, value) => {
     if(typeof value === 'object' && value !== null) {
-        if (value.dataType === 'Map') {
+        if (value.dataType === 'Map')
             return value.value.reduce((map, object) => {
                 map.set(object[0], object[1]);
                 return map;
             }, new WatcherMap(onModify, null));
+        else if (value.dataType === 'DiscordUser') {
+            // it's possible that Discord User has already been created!
+            if (DiscordUser.users.has(value.value.userId))
+                return DiscordUser.users.get(value.value.userId);
+            return new DiscordUser(value.value.userId, value.value.voiceChannels.entries());
         }
-        else if (value.dataType === 'DiscordUser')
-            return new DiscordUser(value.value.userId, value.value.voiceChannels.keys());
-        else if (value.dataType === 'VoiceChat') {
+        else if (value.dataType === 'VoiceChat')
             return new VoiceChat(value.value.channelId, value.value.userIds.keys());
-        }
         else if (value.dataType === 'VoiceChannelFilter')
             return new VoiceChannelFilter(value.value.isWhitelist, value.value.list.keys());
     }

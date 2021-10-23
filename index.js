@@ -23,7 +23,7 @@ for (const file of commandFiles) {
 
 
 // When the client is ready, run this code (only once)
-client.once('ready', () => {
+client.once('ready', async () => {
 	console.log('Ready!');
 });
 
@@ -47,8 +47,9 @@ client.on('voiceStateUpdate', (oldState, newState) => {
 	// and if the channel has 1 person in it now
 	// and if anyone has signed up for it=
 	// for some reason newState can have no channel, so
-	if (newState && newState.channel && newState.channel.members.size === 1 && data.voiceChats.has(newState.channelId)) 
+	if (newState && newState.channel && newState.channel.members.size === 1 && data.voiceChats.has(newState.channelId)) {
 		data.voiceChats.get(newState.channelId).onJoin(newState.member.user);
+	}
 });
 
 // Login to Discord with your client's token

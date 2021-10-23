@@ -32,9 +32,7 @@ class VoiceChat {
     addUser (userId) {
         // create new discord user if needed
         if (!DiscordUser.users.has(userId))
-            new DiscordUser(userId, [
-                this.channelId
-            ]);
+            new DiscordUser(userId, []);
         // update userIds
         this.userIds.set(userId, 0); // the value doesn't actually matter
         // update discord user
@@ -55,12 +53,15 @@ class VoiceChat {
 
     // on someone joining an empty call
     // user is the person who joined the call
-    onJoin (user) {
-        user.client.channels.fetch(this.channelId).then(channel => {
-            this.userIds.forEach((value, key, map) => {
-                DiscordUser.users.get(key).ring(channel, user);
-            }); 
-        });
+    async onJoin (user) {
+        // if the channel cache does not contain the channel 
+        if (!user.client.channels.resolve(this.channelId))
+            await user.client.channels.fetch(this.channelId);
+        
+        let channel = user.client.channels.resolve(this.channelId);
+        this.userIds.forEach((value, key, map) => {
+            DiscordUser.users.get(key).ring(channel, user);
+        }); 
     }
 }
 
