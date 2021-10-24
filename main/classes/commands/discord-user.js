@@ -60,7 +60,8 @@ class DiscordUser {
     // startedUser: discordjs object of the person who started the call
     // message is optional
     // placed in between the username and the invite
-    async ring (channel, startedUser, message) {
+    // force is a boolean: whether or not to send message no matter what (still abides to filter)
+    async ring (channel, startedUser, message, force) {
         // if client is not in guild cache, get fetch from discord
         if (!channel.guild.members.resolve(this.userId))
             await channel.guild.members.fetch(this.userId);
@@ -70,19 +71,35 @@ class DiscordUser {
             let filter = this.getFilter(channel.id);
             let user = channel.client.users.resolve(this.userId);
             
-            // if filter doesn't exist that means that the user is not registered for the channel yet
-            // so someone is ringing them (with ring command)
-            if (!filter || filter.filter(startedUser.id)) {
-                let dm = await user.createDM();
-                let invite = await channel.createInvite({maxUses: 1})
-                dm.send({
-                    content: `${user}, ${startedUser.username} ${message? message: "just joined"} ${invite}`
-                });
-                
-            }
+            if (force || (this.getFilter(channel.id).filter(user.id)  // if the new user passess the filter
+            && this.filter(channel.id, Array.from(channel.members.keys()) ).length === 1)) // if the user is the only person who passes the filter
+                // if filter doesn't exist that means that the user is not registered for the channel yet
+                // so someone is ringing them (with ring command)
+                if (!filter || filter.filter(startedUser.id)) {
+                    let dm = await user.createDM();
+                    let invite = await channel.createInvite({maxUses: 1});
+                    
+                    dm.send({
+                        content: `${user}, ${startedUser.username} ${message? message: "just joined"} ${invite}`
+                    });
+                }
+            
         }
 
     }
+
+    // put a userList through a filter
+    // userList is an array of ids
+    filter(channelId, userList) {
+        let filteredList = [];
+        const filter = this.getFilter(channelId);
+        for (let i = 0; i < userList.length; i ++)
+            if (filter.filter(userList[i]))
+                filteredList.push(userList[i]);
+        return filteredList;
+
+    }
+
 }
 
 module.exports = {

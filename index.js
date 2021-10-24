@@ -47,7 +47,7 @@ client.on('voiceStateUpdate', (oldState, newState) => {
 	// and if the channel has 1 person in it now
 	// and if anyone has signed up for it=
 	// for some reason newState can have no channel, so
-	if (newState && newState.channel && newState.channel.members.size === 1 && data.voiceChats.has(newState.channelId)) {
+	if (newState && newState.channel && data.voiceChats.has(newState.channelId)) {
 		data.voiceChats.get(newState.channelId).onJoin(newState.member.user);
 	}
 });
