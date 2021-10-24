@@ -71,7 +71,8 @@ class DiscordUser {
             let filter = this.getFilter(channel.id);
             let user = channel.client.users.resolve(this.userId);
             
-            if (force || (this.getFilter(channel.id).filter(user.id)  // if the new user passess the filter
+            if (force || (startedUser.id !== this.userId // if the new user is not this
+            && this.getFilter(channel.id).filter(this.userId)  // if the new user passess the filter
             && this.filter(channel.id, Array.from(channel.members.keys()) ).length === 1)) // if the user is the only person who passes the filter
                 // if filter doesn't exist that means that the user is not registered for the channel yet
                 // so someone is ringing them (with ring command)
