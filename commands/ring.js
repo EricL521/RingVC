@@ -30,11 +30,18 @@ module.exports = {
             new DiscordUser(user.id, []);
 
         // send the user an invite link to the voice channel or text channel that the interaction creator is in
-        data.users.get(user.id).ring(channel, interaction.user, "wants you to join");
-
-		await interaction.reply({
-            content: `Notified ${user.username}`,
-            ephemeral: true
+        data.users.get(user.id).ring(channel, interaction.user, "wants you to join")
+        .then(() => {
+            interaction.reply({
+                content: `Notified ${user}`,
+                ephemeral: true
+            });
+        }).catch(err => {
+            interaction.reply({
+                content: `Failed to notify ${user}`,
+                ephemeral: true
+            });
         });
+
 	},
 };

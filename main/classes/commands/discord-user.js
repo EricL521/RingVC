@@ -78,6 +78,7 @@ class DiscordUser {
                 dm.send({
                     content: `${user}, ${startedUser.username} ${message? message: "just joined"} ${invite}`
                 });
+                
             }
         }
 
