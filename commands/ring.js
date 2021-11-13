@@ -31,11 +31,14 @@ module.exports = {
 
         // send the user an invite link to the voice channel or text channel that the interaction creator is in
         data.users.get(user.id).ring(channel, interaction.user, "wants you to join", true)
-        .then(() => {
-            interaction.reply({
-                content: `Notified ${user}`,
-                ephemeral: true
-            });
+        .then(result => {
+            if (result)
+                interaction.reply({
+                    content: `Notified ${user}`,
+                    ephemeral: true
+                });
+            else
+                throw ""; // caught in next line
         }).catch(err => {
             interaction.reply({
                 content: `Failed to notify ${user}`,

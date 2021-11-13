@@ -10,7 +10,7 @@ const {DiscordUser} = require("./discord-user.js");
 
 // class for a discord voice chat
 class VoiceChat {
-    static voiceChats = new WatcherMap();
+    static voiceChats = new WatcherMap(onModify);
 
 
     /*
@@ -31,6 +31,8 @@ class VoiceChat {
 
     // add a user
     addUser (userId, overwriteNewUsers) {
+        onModify();
+
         if (!overwriteNewUsers) {
             // create new discord user if needed
             if (!DiscordUser.users.has(userId))
@@ -45,6 +47,8 @@ class VoiceChat {
 
     // removes a user
     removeUser (userId) {
+        onModify();
+
         this.userIds.delete(userId);
 
         DiscordUser.users.get(userId).removeVoiceChannel(this.channelId);

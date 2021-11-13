@@ -22,7 +22,8 @@ const replacer = (key, value) => {
             dataType: 'DiscordUser',
             value: {
                 userId: value.userId,
-                voiceChannels: value.voiceChannels
+                voiceChannels: value.voiceChannels,
+                globalFilter: value.globalFilter
             }
         };
     else if (value instanceof VoiceChat)
@@ -52,7 +53,7 @@ const reviver = (key, value) => {
                 return map;
             }, new WatcherMap(onModify, null));
         else if (value.dataType === 'DiscordUser') {
-            return new DiscordUser(value.value.userId, value.value.voiceChannels.entries());
+            return new DiscordUser(value.value.userId, value.value.voiceChannels.entries(), value.value.globalFilter);
         }
         else if (value.dataType === 'VoiceChat')
             return new VoiceChat(value.value.channelId, value.value.userIds.keys(), true);
@@ -65,7 +66,7 @@ const reviver = (key, value) => {
 let saving = false;
 let lastSave = new Date();
 const saveData = () => {
-    fs.writeFile("./main/data.txt", JSON.stringify(data, replacer, 4), (err) => {
+    fs.writeFile("./main/data.txt", JSON.stringify(data, replacer), (err) => {
         if (err) throw err;
         console.log("data saved");
     });
