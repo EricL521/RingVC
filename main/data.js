@@ -65,7 +65,9 @@ const reviver = (key, value) => {
 
 let saving = false;
 let lastSave = new Date();
+let timeout;
 const saveData = () => {
+    console.log("saving ...");
     fs.writeFile("./main/data.txt", JSON.stringify(data, replacer), (err) => {
         if (err) throw err;
         console.log("data saved");
@@ -80,10 +82,13 @@ const onModify = () => {
         if (new Date() - lastSave >= saveCooldown * 1000) // saveCooldown is in seconds
             saveData();
         else {
-            setTimeout(saveData, (saveCooldown * 1000) - (new Date() - lastSave));
+            timeout = setTimeout(saveData, (saveCooldown * 1000) - (new Date() - lastSave));
             saving = true;
         }
     }
+};
+const cancelSave = () => {
+    clearTimeout(timeout);
 };
 // set up modify functions
 userOnModifyFunctions.push(onModify);
@@ -98,6 +103,8 @@ const data = {
 const storedText = fs.readFileSync('./main/data.txt');
 if (storedText != "") {
     const storedJSON = JSON.parse(storedText, reviver); // parse text with reviver
+    // NOTE: as the classes are made, they are already set up so storeJSON isn't needed
+    cancelSave();
 
     console.log("data succesfully restored from data.txt");
 }

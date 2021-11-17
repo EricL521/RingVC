@@ -43,13 +43,13 @@ client.on('interactionCreate', async interaction => {
 });
 
 client.on('voiceStateUpdate', (oldState, newState) => {
+	// if oldstate channel is not the same as new state (could update because mic and such)
 	// newstate exists
 	// and if the channel has 1 person in it now
-	// and if anyone has signed up for it=
+	// and if anyone has signed up for it
 	// for some reason newState can have no channel, so
-	if (newState && newState.channel && data.voiceChats.has(newState.channelId)) {
+	if (newState && (!oldState || oldState.channelId !== newState.channelId) && newState.channel && data.voiceChats.has(newState.channelId))
 		data.voiceChats.get(newState.channelId).onJoin(newState.member.user);
-	}
 });
 
 // Login to Discord with your client's token
