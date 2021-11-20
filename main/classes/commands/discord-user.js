@@ -89,25 +89,32 @@ class DiscordUser {
         if (channel.members.has(this.userId)) // if this user is already in the voice chat
             return `${startedUser} is already in ${channel}`;
         
+        const user = channel.client.users.resolve(this.userId);
+
+        // if the new user doesn't pass the filter
+        if (!this.passesFilter(this.getFilter(channel.id), startedUser.id))
+            return `you didn't pass ${user}'s filter`;
+
         if ((force || this.filter(channel.id, Array.from(channel.members.keys()) ).length === 1) // if the user is the only person who passes the filter
-        && this.passesFilter(this.getFilter(channel.id), startedUser.id) // if the new user passess the filter
-        ) {
-            const user = channel.client.users.resolve(this.userId);
-            const dm = await user.createDM();
-            const invite = await channel.createInvite({maxUses: 1});
-            
+        ) 
             return new Promise((resolve) => {
-                dm.send({
-                    content: `${user}, ${startedUser.username} ${message? message: "just joined"} ${invite}`
-                }).then(() => {
-                    resolve(1);
+                user.createDM().then(dm => {
+                    channel.createInvite({maxUses: 1}).then(invite => {
+                        dm.send({
+                            content: `${user}, ${startedUser.username} ${message? message: "just joined"} ${invite}`
+                        }).then(() => {
+                            resolve(1);
+                        }).catch(() => {
+                            resolve(`the messsage to ${user} failed to send`);
+                        });
+                    }).catch(() => {
+                        resolve(`the messsage to ${user} failed to send`);
+                    })
+
                 }).catch(() => {
                     resolve(`the messsage to ${user} failed to send`);
                 });
-            })
-
-        } else 
-            return `you didn't pass ${user}'s filter`;
+            });
 
     }
 
