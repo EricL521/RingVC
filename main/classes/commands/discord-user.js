@@ -9,7 +9,7 @@ const onModify = () => {
 };
 const {WatcherMap} = require("../storage/watcher-map.js");
 
-const {VoiceChannelFilter} = require("./voice-channel-filter.js");
+const {Filter} = require("./filter.js");
 
 // class that represents a discord user with it's filters and such
 class DiscordUser {
@@ -32,7 +32,7 @@ class DiscordUser {
         for (let i = 0; i < voiceChannelsArray.length; i ++) 
             this.addVoiceChannel(voiceChannelsArray[i][0], voiceChannelsArray[i][1]);
         
-        this.globalFilter = globalFilter? globalFilter: new VoiceChannelFilter(false, []);
+        this.globalFilter = globalFilter? globalFilter: new Filter(false, []);
     }
 
     // adds a voice channel
@@ -41,7 +41,7 @@ class DiscordUser {
         onModify();
 
         this.voiceChannels.set(
-            channelId, filter? filter : new VoiceChannelFilter(false, [])
+            channelId, filter? filter : new Filter(false, [])
         );
     }
 

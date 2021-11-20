@@ -8,7 +8,7 @@ const {saveCooldown} = require("../config.json");
 const {WatcherMap} = require('./classes/storage/watcher-map.js');
 const {DiscordUser, userOnModifyFunctions} = require('./classes/commands/discord-user.js');
 const {VoiceChat, voiceChatOnModifyFunctions} = require('./classes/commands/voice-chat.js');
-const {VoiceChannelFilter, filterOnModifyFunctions} = require('./classes/commands/voice-channel-filter.js');
+const {Filter, filterOnModifyFunctions} = require('./classes/commands/filter.js');
 
 // stolen from https://stackoverflow.com/questions/29085197/how-do-you-json-stringify-an-es6-map
 const replacer = (key, value) => {
@@ -34,7 +34,7 @@ const replacer = (key, value) => {
                 userIds: value.userIds
             }
         };
-    else if (value instanceof VoiceChannelFilter)
+    else if (value instanceof Filter)
         return {
             dataType: 'VoiceChannelFilter',
             value: {
@@ -58,7 +58,7 @@ const reviver = (key, value) => {
         else if (value.dataType === 'VoiceChat')
             return new VoiceChat(value.value.channelId, value.value.userIds.keys(), true);
         else if (value.dataType === 'VoiceChannelFilter')
-            return new VoiceChannelFilter(value.value.isWhitelist, value.value.list.keys());
+            return new Filter(value.value.isWhitelist, value.value.list.keys());
     }
     return value;
 };

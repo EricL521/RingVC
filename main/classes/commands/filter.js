@@ -7,7 +7,7 @@ const onModify = () => {
 };
 
 // class for whitelist or blacklist
-class VoiceChannelFilter {
+class Filter {
     /* 
         isWhitelist is a boolean
         list is the whitelist or blacklist
@@ -78,6 +78,6 @@ class VoiceChannelFilter {
 }
 
 module.exports = {
-    VoiceChannelFilter: VoiceChannelFilter,
+    Filter: Filter,
     filterOnModifyFunctions: onModifyFunctions
 }
