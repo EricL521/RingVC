@@ -65,43 +65,49 @@ class DiscordUser {
     // whether or not a user passes the filter
     passesFilter(filter, userId) {
         // if filter doesn't exist, it passes
-        return (!filter || filter.filter(userId)) && this.globalFilter.filter(userId);
+        return (!filter || (filter.filter(userId) && this.globalFilter.filter(userId)));
     }
 
-    // called when a call is started
-    // channel: discordjs object of the channel the person joined
-    // startedUser: discordjs object of the person who started the call
-    // message is optional
-    // placed in between the username and the invite
-    // force is a boolean: whether or not to send message no matter what (still abides to filter)
-    // returns true or false depending on whether it sent or not
+    /*
+        * called when a call is started
+        * channel: discordjs object of the channel the person joined
+        * startedUser: discordjs object of the person who started the call
+        * message is optional
+        * placed in between the username and the invite
+        * force is a boolean: whether or not to ignore how many people are in the vc, and who is being rung (still abides to filter)
+        * returns 1 if it sent, and a string as the reason why it couldn't send if it didn't send
+    */
     async ring (channel, startedUser, message, force) {
         // if client is not in guild cache, get fetch from discord
         if (!channel.guild.members.resolve(this.userId))
-            await channel.guild.members.fetch(this.userId);
+        await channel.guild.members.fetch(this.userId);
 
-        // if user can join channel
-        if (channel.permissionsFor(this.userId).has(Permissions.FLAGS.CONNECT)) {
+        // if user can't join channel
+        if (!channel.permissionsFor(this.userId).has(Permissions.FLAGS.CONNECT))
+            return `${startedUser} can't join ${channel}`;
+
+        if (channel.members.has(this.userId)) // if this user is already in the voice chat
+            return `${startedUser} is already in ${channel}`;
+        
+        if ((force || this.filter(channel.id, Array.from(channel.members.keys()) ).length === 1) // if the user is the only person who passes the filter
+        && this.passesFilter(this.getFilter(channel.id), startedUser.id) // if the new user passess the filter
+        ) {
             const user = channel.client.users.resolve(this.userId);
+            const dm = await user.createDM();
+            const invite = await channel.createInvite({maxUses: 1});
             
-            if ((force || (startedUser.id !== this.userId // if the new user is not this
-            && this.filter(channel.id, Array.from(channel.members.keys()) ).length === 1)) // if the user is the only person who passes the filter
-            && this.passesFilter(this.getFilter(channel.id), startedUser.id) // if the new user passess the filter
-            ) {
-                let dm = await user.createDM();
-                let invite = await channel.createInvite({maxUses: 1});
-                
+            return new Promise((resolve) => {
                 dm.send({
                     content: `${user}, ${startedUser.username} ${message? message: "just joined"} ${invite}`
+                }).then(() => {
+                    resolve(1);
+                }).catch(() => {
+                    resolve(`the messsage to ${user} failed to send`);
                 });
+            })
 
-                return true;
-            } else 
-                return false;
-            
-        }
-
-        return false;
+        } else 
+            return `you didn't pass ${user}'s filter`;
 
     }
 
