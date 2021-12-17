@@ -1,5 +1,5 @@
 // used for permission flags
-const {Permissions} = require("discord.js");
+const {Permissions, MessageActionRow, MessageButton} = require("discord.js");
 
 // both used to notify data.js
 const onModifyFunctions = [];
@@ -82,14 +82,14 @@ class DiscordUser {
         if (!channel.guild.members.resolve(this.userId))
         await channel.guild.members.fetch(this.userId);
 
+        const user = channel.client.users.resolve(this.userId);
+
         // if user can't join channel
         if (!channel.permissionsFor(this.userId).has(Permissions.FLAGS.CONNECT))
-            return `${startedUser} can't join ${channel}`;
+            return `${user} can't join ${channel}`;
 
         if (channel.members.has(this.userId)) // if this user is already in the voice chat
-            return `${startedUser} is already in ${channel}`;
-        
-        const user = channel.client.users.resolve(this.userId);
+            return `${user} is already in ${channel}`;
 
         // if the new user doesn't pass the filter
         if (!this.passesFilter(this.getFilter(channel.id), startedUser.id))
@@ -107,7 +107,7 @@ class DiscordUser {
                         }).catch(() => {
                             resolve(`the messsage to ${user} failed to send`);
                         });
-                    }).catch(() => {
+                    }).catch((e) => {
                         resolve(`the messsage to ${user} failed to send`);
                     })
 
