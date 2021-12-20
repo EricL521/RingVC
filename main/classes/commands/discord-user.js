@@ -98,13 +98,16 @@ class DiscordUser {
         if ((isCommand || this.filter(channel.id, Array.from(channel.members.keys()) ).length === 1) // if the user is the only person who passes the filter
         ) 
             return new Promise((resolve) => {    
+                let embeds;
+                if (isCommand)
+                    embeds = [new MessageEmbed().setTitle("Send a message to reply")];
+                else
+                    embeds = [];
                 channel.createInvite({maxUses: 1}).then(invite => {
                     this.sendMessage(user, {
                         content: `${user}, ${startedUser.username} ${message? message: "just joined"} ${invite}`,
-                        embeds: [new MessageEmbed()
-                        .setTitle("Send a message to reply")]
-                    })
-                    .then(() => {
+                        embeds: embeds
+                    }).then(() => {
                         resolve(1);
                     }).catch((e) => {
                         resolve(`the messsage to ${user} failed to send`);
