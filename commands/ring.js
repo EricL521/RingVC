@@ -46,9 +46,7 @@ module.exports = {
                         .setAuthor(message.author.username, message.author.avatarURL())
                         .setTitle(`${message}`)]
                     });
-                }).catch((error) => {
-                    console.error(error);
-                });
+                }).catch(() => {});
             }
             else
                 interaction.reply({
