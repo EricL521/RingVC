@@ -5,10 +5,14 @@ const fs = require('fs');
 const { Client, Collection, Intents } = require('discord.js');
 const { token } = require('./config.json');
 
-const client = new Client({ intents: [
-	Intents.FLAGS.GUILDS,
-	Intents.FLAGS.GUILD_VOICE_STATES
-] });
+const client = new Client({
+	intents: [
+		Intents.FLAGS.GUILDS,
+		Intents.FLAGS.GUILD_VOICE_STATES,
+		Intents.FLAGS.DIRECT_MESSAGES
+	],
+	partials: ["CHANNEL"]
+});
 
 // load commands
 client.commands = new Collection();
@@ -20,7 +24,6 @@ for (const file of commandFiles) {
 	// With the key as the command name and the value as the exported module
 	client.commands.set(command.data.name, command);
 }
-
 
 // When the client is ready, run this code (only once)
 client.once('shardReady', async () => {

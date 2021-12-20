@@ -1,5 +1,5 @@
 // used for permission flags
-const {Permissions, MessageActionRow, MessageButton} = require("discord.js");
+const {Permissions, MessageActionRow, MessageButton, MessageCollector, MessageEmbed} = require("discord.js");
 
 // both used to notify data.js
 const onModifyFunctions = [];
@@ -70,14 +70,14 @@ class DiscordUser {
 
     /*
         * called when a call is started
-        * channel: discordjs object of the channel the person joined
+        * channel: discordjs object of the channel the person is in
         * startedUser: discordjs object of the person who started the call
         * message is optional
         * placed in between the username and the invite
-        * force is a boolean: whether or not to ignore how many people are in the vc, and who is being rung (still abides to filter)
+        * isCommand is a boolean: whether or not the ring is coming from a command
         * returns 1 if it sent, and a string as the reason why it couldn't send if it didn't send
     */
-    async ring (channel, startedUser, message, force) {
+    async ring (channel, startedUser, message, isCommand) {
         // if client is not in guild cache, get fetch from discord
         if (!channel.guild.members.resolve(this.userId))
         await channel.guild.members.fetch(this.userId);
@@ -95,27 +95,57 @@ class DiscordUser {
         if (!this.passesFilter(this.getFilter(channel.id), startedUser.id))
             return `you didn't pass ${user}'s filter`;
 
-        if ((force || this.filter(channel.id, Array.from(channel.members.keys()) ).length === 1) // if the user is the only person who passes the filter
+        if ((isCommand || this.filter(channel.id, Array.from(channel.members.keys()) ).length === 1) // if the user is the only person who passes the filter
         ) 
-            return new Promise((resolve) => {
-                user.createDM().then(dm => {
-                    channel.createInvite({maxUses: 1}).then(invite => {
-                        dm.send({
-                            content: `${user}, ${startedUser.username} ${message? message: "just joined"} ${invite}`
-                        }).then(() => {
-                            resolve(1);
-                        }).catch(() => {
-                            resolve(`the messsage to ${user} failed to send`);
-                        });
+            return new Promise((resolve) => {    
+                channel.createInvite({maxUses: 1}).then(invite => {
+                    this.sendMessage(user, {
+                        content: `${user}, ${startedUser.username} ${message? message: "just joined"} ${invite}`,
+                        embeds: [new MessageEmbed()
+                        .setTitle("Send a message to reply")]
+                    })
+                    .then(() => {
+                        resolve(1);
                     }).catch((e) => {
                         resolve(`the messsage to ${user} failed to send`);
                     })
-
                 }).catch(() => {
-                    resolve(`the messsage to ${user} failed to send`);
-                });
+                    resolve(`could not create an invite for ${channel}`);
+                })
             });
 
+    }
+
+    // sends a message to this user
+    // resolves to sentmessage if successful, and rejects otherwise
+    async sendMessage(user, message) {
+        return new Promise((resolve, reject) => {
+            user.createDM().then(dm => {
+                dm.send(message).then((sentMessage) => {
+                    resolve(sentMessage);
+                }).catch((e) => {
+                    reject("message failed to send");
+                });
+            }).catch((e) => {
+                reject("message failed to send");
+            });
+        });
+    }
+
+    // returns reponse if there is one
+    // user.dmchannel should already be created
+    getResponse (user) {
+        return new Promise((resolve, reject) => {
+            user.dmChannel.createMessageCollector({
+                max: 1,
+                time: 30000
+            }).on("collect", (message) => {
+                resolve(message);
+            }).on("end", (_, reason) => {
+                if (reason !== "limit")
+                    reject()
+            });
+        });
     }
 
     // put a userList through a filter

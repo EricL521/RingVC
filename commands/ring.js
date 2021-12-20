@@ -3,6 +3,7 @@ const voice = require('@discordjs/voice');
 
 const {data} = require('../main/data.js');
 const {DiscordUser} = require('../main/classes/commands/discord-user.js');
+const { MessageEmbed } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -29,14 +30,26 @@ module.exports = {
         if (!data.users.has(user.id))
             new DiscordUser(user.id, []);
 
+        const discordUser = data.users.get(user.id);
         // send the user an invite link to the voice channel or text channel that the interaction creator is in
-        data.users.get(user.id).ring(channel, interaction.user, "wants you to join", true)
+        discordUser.ring(channel, interaction.user, "wants you to join", true)
         .then(result => {
-            if (result === 1)
+            if (result === 1) {
                 interaction.reply({
                     content: `Notified ${user}`,
                     ephemeral: true
                 });
+                
+                discordUser.getResponse(user).then(message => {
+                    interaction.editReply({
+                        embeds: [new MessageEmbed()
+                        .setAuthor(message.author.username, message.author.avatarURL())
+                        .setTitle(`${message}`)]
+                    });
+                }).catch((error) => {
+                    console.error(error);
+                });
+            }
             else
                 interaction.reply({
                     content: `Failed to notify ${user} because ${result}`,
