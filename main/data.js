@@ -89,6 +89,7 @@ const onModify = () => {
 };
 const cancelSave = () => {
     clearTimeout(timeout);
+    saving = false;
 };
 // set up modify functions
 userOnModifyFunctions.push(onModify);
