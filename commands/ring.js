@@ -36,7 +36,7 @@ module.exports = {
         .then(result => {
             if (result === 1) {
                 interaction.reply({
-                    content: `Notified ${user}`,
+                    content: `Notified ${user}\nWait to see their response`,
                     ephemeral: true
                 });
                 
@@ -46,7 +46,12 @@ module.exports = {
                         .setAuthor(message.author.username, message.author.avatarURL())
                         .setTitle(`${message}`)]
                     });
-                }).catch(() => {});
+                    discordUser.sendMessage(user, "Message Forwarded");
+                }).catch(() => {
+                    interaction.editReply({
+                        content: `${user} didn't respond`
+                    })
+                });
             }
             else
                 interaction.reply({

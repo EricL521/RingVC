@@ -38,8 +38,6 @@ class DiscordUser {
     // adds a voice channel
     // an optional filter object
     addVoiceChannel(channelId, filter) {
-        onModify();
-
         this.voiceChannels.set(
             channelId, filter? filter : new Filter(false, [])
         );
@@ -47,8 +45,6 @@ class DiscordUser {
 
     // removes a voice channel
     removeVoiceChannel(channelId) {
-        onModify();
-
         this.voiceChannels.delete(channelId);
     }
 
@@ -141,7 +137,7 @@ class DiscordUser {
         return new Promise((resolve, reject) => {
             user.dmChannel.createMessageCollector({
                 max: 1,
-                time: 30000
+                time: 60000
             }).on("collect", (message) => {
                 resolve(message);
             }).on("end", (_, reason) => {

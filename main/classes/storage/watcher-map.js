@@ -1,15 +1,20 @@
 // class for watching maps
 class WatcherMap extends Map {
     // onset and onget are functions
-    constructor(onSet, onGet, ...args) {
+    constructor(onModify, onGet, ...args) {
         super(...args);
 
-        this.onSet = (onSet === null || typeof onSet === "undefined")? () => {}: onSet;
+        this.onModify = (onModify === null || typeof onModify === "undefined")? () => {}: onModify;
         this.onGet = (onGet === null || typeof onGet === "undefined")? () => {}: onGet;
     }
 
     set(...args) {
-        this.onSet();
+        this.onModify();
+        return super.set(...args);
+    }
+
+    delete(...args) {
+        this.onModify();
         return super.set(...args);
     }
 

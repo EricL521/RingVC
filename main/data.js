@@ -64,18 +64,38 @@ const reviver = (key, value) => {
 };
 
 let saving = false;
+let writingVariable = {
+    writing: false, 
+    onFinished: null
+};
+let writing = new Proxy(writingVariable, {
+    set: function (target, key, value) {
+        target[key] = value;
+
+        if (key === "writing" && !value) {
+            try {
+                this.onFinished()
+                console.log("ran function");
+            } catch (error) {
+                // do nothing
+            }
+        }
+    }
+});
+
 let lastSave = new Date();
 let timeout;
 const saveData = () => {
     console.log("saving ...");
+    writing.writing = true;
     fs.writeFile("./main/data.txt", JSON.stringify(data, replacer), (err) => {
         if (err) throw err;
         console.log("data saved");
+        writing.writing = false;
+        // update variables
+        saving = false;
+        lastSave = new Date();
     });
-
-    // update variables
-    saving = false;
-    lastSave = new Date();
 };
 const onModify = () => {
     if (!saving) {
@@ -103,7 +123,7 @@ const data = {
 // read data.txt
 const storedText = fs.readFileSync('./main/data.txt');
 if (storedText != "") {
-    const storedJSON = JSON.parse(storedText, reviver); // parse text with reviver
+    JSON.parse(storedText, reviver); // parse text with reviver
     // NOTE: as the classes are made, they are already set up so storeJSON isn't needed
     cancelSave();
 
@@ -114,6 +134,29 @@ else {
     saveData();
     console.log("data.txt was empty, so data was reset to default");
 }
+
+process.on("SIGINT", () => {
+    // if data is saving, wait for it to be done then shut down
+    if (saving) {
+        // if it is not currently writing, cancel the timeout, and save immediately
+        if (!writing) {
+            cancelSave();
+            saveData();
+
+            // end process
+            process.exit();
+        }
+        else {
+            writing.onFinished = () => {
+                // end process when finished saving
+                process.exit();
+            }
+        }
+    }
+
+    // end process
+    process.exit();
+});
 
 module.exports = {
     data: data
