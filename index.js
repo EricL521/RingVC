@@ -25,9 +25,18 @@ for (const file of commandFiles) {
 	client.commands.set(command.data.name, command);
 }
 
-// When the client is ready, run this code (only once)
-client.once('shardReady', async () => {
-	console.log('Ready!');
+// When the client is ready, run this code
+client.once('ready', async () => {
+	console.log('Ready');
+})
+client.on('shardError', async () => {
+	console.log('disconnected');
+});
+client.on('shardReconnecting', async () => {
+	console.log('reconnecting');
+});
+client.on('shardResume', () => {
+	console.log('reconnected');
 });
 
 client.on('interactionCreate', async interaction => {
