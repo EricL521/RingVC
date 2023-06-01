@@ -1,7 +1,6 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const {VoiceChat} = require('../main/classes/commands/voice-chat.js');
+const { SlashCommandBuilder } = require('discord.js');
 
-const {data} = require('../main/data.js');
+const {VoiceChat} = require('../main/classes/commands/voice-chat.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -11,7 +10,7 @@ module.exports = {
             option.setName('channel')
                 .setDescription('Select the call to be "rung" for')
                 .setRequired(true)),
-	async execute(interaction) {
+	async execute(data, interaction) {
         const channel = interaction.options.getChannel('channel');
         const user = interaction.user;
         if (!channel.isVoice) {

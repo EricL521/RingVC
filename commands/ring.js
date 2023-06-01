@@ -1,9 +1,6 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const voice = require('@discordjs/voice');
+const { SlashCommandBuilder, MessageEmbed } = require('discord.js');
 
-const {data} = require('../main/data.js');
 const {DiscordUser} = require('../main/classes/commands/discord-user.js');
-const { MessageEmbed } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -13,7 +10,7 @@ module.exports = {
             option.setName('user')
                 .setDescription('Select a user')
                 .setRequired(true)),
-	async execute(interaction) {
+	async execute(data, interaction) {
         const user = interaction.options.getUser('user');
         const channel = interaction.member.voice.channel;
         // if channel doesn't exist (user not in call)

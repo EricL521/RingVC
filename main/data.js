@@ -121,21 +121,29 @@ const data = {
     users: DiscordUser.users,
 };
 // read data.txt
-const storedText = fs.readFileSync('./main/data.txt');
-if (storedText != "") {
-    JSON.parse(storedText, reviver); // parse text with reviver
-    // NOTE: as the classes are made, they are already set up so storeJSON isn't needed
-    cancelSave();
+if (fs.existsSync('./main/data.txt')) { 
+	const storedText = fs.readFileSync('./main/data.txt');
+	if (storedText != "") {
+		JSON.parse(storedText, reviver); // parse text with reviver
+		// NOTE: as the classes are made, they are already set up so storeJSON isn't needed
+		cancelSave();
 
-    console.log("data succesfully restored from data.txt");
+		console.log("data succesfully restored from data.txt");
+	}
+	else {
+		saveData();
+		console.log("data.txt was empty, so data was reset to default");
+	}
 }
-// if data.txt is empty
+// if data.txt doesn't exist
 else {
+	// creat file
+	fs.writeFileSync('./main/data.txt', "");
     saveData();
     console.log("data.txt was empty, so data was reset to default");
 }
 
-process.on("SIGINT", () => {
+process.on("beforeExit", () => {
     // if data is saving, wait for it to be done then shut down
     if (saving) {
         // if it is not currently writing, cancel the timeout, and save immediately

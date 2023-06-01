@@ -1,6 +1,5 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 
-const {data} = require('../main/data.js');
 const { DiscordUser } = require('../main/classes/commands/discord-user.js');
 
 module.exports = {
@@ -13,10 +12,10 @@ module.exports = {
             .addIntegerOption(option =>
                 option.setName("add_or_remove")
                 .setDescription("Choose to add or remove users")
-                .addChoices([
-                    ["add", 1],
-                    ["remove", 0]
-                ])
+                .addChoices(
+					{name: "Add", value: 1},
+					{name: "Remove", value: 0}
+				)
                 .setRequired(true))
             .addUserOption(option =>
                 option.setName("user")
@@ -32,16 +31,16 @@ module.exports = {
             .addStringOption(option =>
                 option.setName("filter_type")
                 .setDescription("Choose the new filter type. If the filter is already that type, nothing changes")
-                .addChoices([
-                    ["whitelist", "whitelist"],
-                    ["blacklist", "blacklist"]
-                ])
+                .addChoices(
+					{name: "Whitelist", value: "whitelist"},
+					{name: "Blacklist", value: "blacklist"}
+				)
                 .setRequired(true))
             .addChannelOption(option =>
                 option.setName("channel")
                 .setDescription("Which channel's filter to modify")
                 .setRequired(false))),
-	async execute(interaction) {
+	async execute(data, interaction) {
         // modifying users list
         if (interaction.options.getSubcommand() === "users") {
             const currentUser = interaction.user; // user who started the command

@@ -1,7 +1,5 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const voice = require('@discordjs/voice');
+const { SlashCommandBuilder } = require('discord.js');
 
-const {data} = require('../main/data.js');
 const {DiscordUser} = require('../main/classes/commands/discord-user.js');
 
 module.exports = {
@@ -12,7 +10,7 @@ module.exports = {
             option.setName('channel')
             .setDescription('Resets this voice channel\'s filter. Leave blank for your global filter')
             .setRequired(false)),
-	async execute(interaction) {
+	async execute(data, interaction) {
         const currentUser = interaction.user; // user who started the command
         const channel = interaction.options.getChannel("channel");
         // if they inputted a channel
