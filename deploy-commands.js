@@ -22,10 +22,8 @@ const getFiles = (dir) => {
 const folderPath = path.join(__dirname, 'commands');
 const filePaths = getFiles(folderPath).filter(file => file.endsWith('.js'));
 const commands = [];
-console.log(filePaths);
 // Loop over the command files and set all the commands in the collection
-for (const filePath of filePaths) {
-	console.log(`FILE: '${filePath}'`);
+for (const filePath of filePaths) {;
 	const command = require(filePath);
 	if ('data' in command && 'execute' in command) {
 		commands.push(command.data.toJSON());
