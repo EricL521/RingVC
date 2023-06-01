@@ -58,7 +58,7 @@ client.on('interactionCreate', async interaction => {
 	if (!interaction.isButton()) return;
 
 	console.log(interaction);
-})
+});
 
 client.on('voiceStateUpdate', (oldState, newState) => {
 	// if oldstate channel is not the same as new state (could update because mic and such)

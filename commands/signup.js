@@ -5,17 +5,13 @@ const {VoiceChat} = require('../main/classes/commands/voice-chat.js');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('signup')
-		.setDescription('Sign up to get "rung" when someone starts a call')
-        .addChannelOption(option => 
-            option.setName('channel')
-                .setDescription('Select the call to be "rung" for')
-                .setRequired(true)),
+		.setDescription('Sign up to get "rung" when someone starts a call'),
 	async execute(data, interaction) {
-        const channel = interaction.options.getChannel('channel');
+        const channel = interaction.channel;
         const user = interaction.user;
-        if (!channel.isVoice) {
+        if (!channel.isVoiceBased()) {
             interaction.reply({
-                content: `You can only sign up for voice channels`,
+                content: `You must run this command in the Voice Channel (the new VC text channels) you want to sign up for`,
                 ephemeral: true
             });
             return; // stop the rest of function
