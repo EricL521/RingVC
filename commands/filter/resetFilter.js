@@ -1,18 +1,19 @@
 const { SlashCommandBuilder } = require('discord.js');
 
-const { DiscordUser } = require('../main/classes/commands/discord-user.js');
+const {DiscordUser} = require('../../main/classes/commands/discord-user.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('get_filter')
-		.setDescription('Gets the type and list of users of a filter')
+		.setName('reset_filter')
+		.setDescription('Resets a filter. Also resets to blacklist')
         .addChannelOption(option => 
             option.setName('channel')
-            .setDescription('Get this voice channel\'s filter. Leave blank to get global filter')
+            .setDescription('Resets this voice channel\'s filter. Leave blank for your global filter')
             .setRequired(false)),
 	async execute(data, interaction) {
         const currentUser = interaction.user; // user who started the command
         const channel = interaction.options.getChannel("channel");
+        // if they inputted a channel
         if (channel) {
             if (!channel.isVoiceBased()) {
                 interaction.reply({
@@ -30,13 +31,10 @@ module.exports = {
                 });
             else {
                 const filter = discordUser.getFilter(channel.id);
-                let userList = "";
-                filter.getList().forEach((value, key, map) => {
-                    userList += `<@${key}>\n`;
-                });
+                filter.setType("blacklist"); // also resets filter
                 
                 interaction.reply({
-                    content: `__List of people in your ${filter.getType()} for ${channel}__\n${userList? userList: "None"}`,
+                    content: `Filter for ${channel} has been reset and is now a ${filter.getType()}`,
                     ephemeral: true
                 });
             }
@@ -47,13 +45,10 @@ module.exports = {
                 discordUser = new DiscordUser(currentUser.id, []);
             else {
                 const filter = discordUser.globalFilter;
-                let userList = "";
-                filter.getList().forEach((value, key, map) => {
-                    userList += `<@${key}>\n`;
-                });
+                filter.setType("blacklist"); // also resets filter
                 
                 interaction.reply({
-                    content: `__List of people in your global ${filter.getType()}__\n${userList? userList: "None"}`,
+                    content: `Your global filter has been reset and is now a ${filter.getType()}`,
                     ephemeral: true
                 });
             }
