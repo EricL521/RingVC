@@ -1,5 +1,5 @@
 // used for permission flags
-const {Permissions, MessageActionRow, MessageButton, MessageCollector, MessageEmbed} = require("discord.js");
+const {PermissionsBitField} = require("discord.js");
 
 // both used to notify data.js
 const onModifyFunctions = [];
@@ -67,11 +67,11 @@ class DiscordUser {
     /*
         * called when a call is started
         * channel: discordjs object of the channel the person is in
-        * startedUser: discordjs object of the person who started the call
+        * startedUser: discordjs object of the person who started the call / command
         * message is optional
         * placed in between the username and the invite
         * isCommand is a boolean: whether or not the ring is coming from a command
-        * returns 1 if it sent, and a string as the reason why it couldn't send if it didn't send
+        * resolves if it sent, and throws an error as the reason why it couldn't send if it didn't send
     */
     async ring (channel, startedUser, message, isCommand) {
         // if client is not in guild cache, get fetch from discord
@@ -81,70 +81,25 @@ class DiscordUser {
         const user = channel.client.users.resolve(this.userId);
 
         // if user can't join channel
-        if (!channel.permissionsFor(this.userId).has(Permissions.FLAGS.CONNECT))
-            return `${user} can't join ${channel}`;
+        if (!channel.permissionsFor(this.userId).has(PermissionsBitField.Flags.Connect))
+            throw new Error(`${user} can't join ${channel}`);
 
         if (channel.members.has(this.userId)) // if this user is already in the voice chat
-            return `${user} is already in ${channel}`;
+			throw new Error(`${user} is already in ${channel}`);
 
         // if the new user doesn't pass the filter
         if (!this.passesFilter(this.getFilter(channel.id), startedUser.id))
-            return `you didn't pass ${user}'s filter`;
+			throw new Error(`you didn't pass ${user}'s filter`);
 
-        if ((isCommand || this.filter(channel.id, Array.from(channel.members.keys()) ).length === 1) // if the user is the only person who passes the filter
-        ) 
-            return new Promise((resolve) => {    
-                let embeds;
-                if (isCommand)
-                    embeds = [new MessageEmbed().setTitle("Send a message to reply")];
-                else
-                    embeds = [];
-                channel.createInvite({maxUses: 1}).then(invite => {
-                    this.sendMessage(user, {
-                        content: `${user}, ${startedUser.username} ${message? message: "just joined"} ${invite}`,
-                        embeds: embeds
-                    }).then(() => {
-                        resolve(1);
-                    }).catch((e) => {
-                        resolve(`the messsage to ${user} failed to send`);
-                    })
-                }).catch(() => {
-                    resolve(`could not create an invite for ${channel}`);
-                })
+        if ((isCommand || this.filter(channel.id, Array.from(channel.members.keys()) ).length === 1)) // if the user is the only person who passes the filter 
+            return new Promise((resolve) => {
+				channel.send({
+					content: `${user}, ${startedUser} ${message? message: "just joined"} ${channel}`,
+					allowedMentions: {users: [user.id]}
+				})
+				.then(() => resolve())
+				.catch((err) => {console.error(err); throw new Error(`the message to ${user} failed to send`)});
             });
-
-    }
-
-    // sends a message to this user
-    // resolves to sentmessage if successful, and rejects otherwise
-    async sendMessage(user, message) {
-        return new Promise((resolve, reject) => {
-            user.createDM().then(dm => {
-                dm.send(message).then((sentMessage) => {
-                    resolve(sentMessage);
-                }).catch((e) => {
-                    reject("message failed to send");
-                });
-            }).catch((e) => {
-                reject("message failed to send");
-            });
-        });
-    }
-
-    // returns reponse if there is one
-    // user.dmchannel should already be created
-    getResponse (user) {
-        return new Promise((resolve, reject) => {
-            user.dmChannel.createMessageCollector({
-                max: 1,
-                time: 60000
-            }).on("collect", (message) => {
-                resolve(message);
-            }).on("end", (_, reason) => {
-                if (reason !== "limit")
-                    reject()
-            });
-        });
     }
 
     // put a userList through a filter
@@ -156,7 +111,6 @@ class DiscordUser {
             if (this.passesFilter(filter, userList[i]))
                 filteredList.push(userList[i]);
         return filteredList;
-
     }
 
 }

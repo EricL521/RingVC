@@ -65,29 +65,27 @@ const reviver = (key, value) => {
 
 // whether or not data has been updated
 let updated = false;
-let writing = false;
 
 let lastSave = new Date();
-let timeout;
-let onDataFinishWriting;
+let timeout; // used to store timeout for saving during cooldown
+let saved; // a promise that resolves when data is saved
 const saveData = () => {
-    console.log("DO NOT QUIT!!! saving ...");
-    writing = true;
-	try {
-    	fs.writeFileSync("./main/data.txt", JSON.stringify(data, replacer));
-	} catch (err) {
-		console.log("error saving data");
-		throw err;
-	}
-	console.log("data saved");
-	writing = false;
-	// update variables
-	updated = false;
-	lastSave = new Date();
-	
-	// used for exiting the program
-	if (onDataFinishWriting)
-		onDataFinishWriting();
+	saved = new Promise((resolve, reject) => {
+		console.log("DO NOT QUIT!!! saving ...");
+		try {
+			fs.writeFileSync("./main/data.txt", JSON.stringify(data, replacer));
+		} catch (err) {
+			console.log("error saving data");
+			reject(err);
+			throw err;
+		}
+		console.log("data saved");
+		// update variables
+		updated = false;
+		lastSave = new Date();
+
+		resolve();
+	});
 };
 const onModify = () => {
 	// if it is already updated, then we don't need to do anything
@@ -137,24 +135,17 @@ else {
 
 // save data when exiting
 [`exit`, `SIGINT`, `SIGUSR1`, `SIGUSR2`, `uncaughtException`, `SIGTERM`].forEach((eventType) => {
-	process.on(eventType, () => {
-		// if data is waiting to be saved, then save immediately if possible
-		if (updated) {
-			// if it is not currently writing, cancel the timeout, and save immediately
-			if (!writing) {
-				cancelSave();
-				saveData();
+	process.on(eventType, async (err) => {
+		if (err)
+			console.error(err);
 
+		// if data is waiting to be saved, then save immediately if possible
+		if (updated)
+			// runs when data is finished saving 
+			return await saved.then(() => {
 				// end process
 				process.exit();
-			}
-			else {
-				// if we are writing, then wait for it to finish and then exit
-				onDataFinishWriting = () => {
-					process.exit();
-				}
-			}
-		}
+			});
 
 		// end process
 		process.exit();

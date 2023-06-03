@@ -30,32 +30,18 @@ module.exports = {
         const discordUser = data.users.get(user.id);
         // send the user an invite link to the voice channel or text channel that the interaction creator is in
         discordUser.ring(channel, interaction.user, "wants you to join", true)
-        .then(result => {
-            if (result === 1) {
-                interaction.reply({
-                    content: `Notified ${user}\nWait to see their response`,
-                    ephemeral: true
-                });
-                
-                discordUser.getResponse(user).then(message => {
-                    interaction.editReply({
-                        embeds: [new MessageEmbed()
-                        .setAuthor(message.author.username, message.author.avatarURL())
-                        .setTitle(`${message}`)]
-                    });
-                    discordUser.sendMessage(user, "Message Forwarded");
-                }).catch(() => {
-                    interaction.editReply({
-                        content: `${user} didn't respond`
-                    })
-                });
-            }
-            else
-                interaction.reply({
-                    content: `Failed to notify ${user} because ${result}`,
-                    ephemeral: true
-                });
-        });
+        .then(() => {
+			interaction.reply({
+				content: `Notified ${user}`,
+				ephemeral: true
+			});
+        })
+		.catch((err) => {
+			interaction.reply({
+				content: `Failed to notify ${user} because ${err}`,
+				ephemeral: true
+			});
+		});
 
 	},
 };
