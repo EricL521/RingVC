@@ -15,7 +15,7 @@ class WatcherMap extends Map {
 
     delete(...args) {
         this.onModify();
-        return super.set(...args);
+        return super.delete(...args);
     }
 
     get(...args) {
