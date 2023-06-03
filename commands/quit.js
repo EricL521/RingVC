@@ -3,18 +3,19 @@ const { SlashCommandBuilder } = require('discord.js');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('quit')
-		.setDescription('Stop being "rung" for a voice chat')
-        .addChannelOption(option => 
-            option.setName('channel')
-                .setDescription('Select the call to stop being "rung" for')
-                .setRequired(true)),
+		.setDescription('Stop being "rung" for a voice chat'),
 	async execute(data, interaction) {
+        const channel = interaction.channel;
         const user = interaction.user;
-        const channel = interaction.options.getChannel('channel');
-        if (!channel.isVoice) {
+        if (!channel.isVoiceBased()) {
+			const moreInfo = new ButtonBuilder()
+				.setLabel('More Info')
+				.setStyle(ButtonStyle.Link)
+				.setURL('https://support.discord.com/hc/en-us/articles/4412085582359-Text-Channels-Text-Chat-In-Voice-Channels')
             interaction.reply({
-                content: `You can only sign up for voice channels`,
-                ephemeral: true
+                content: `You must run this command in the Voice Channel (the new VC text channels) you want to quit recieving 'rings' for`,
+                ephemeral: true,
+				components: [new ActionRowBuilder().addComponents(moreInfo)]
             });
             return; // stop the rest of function
         }
