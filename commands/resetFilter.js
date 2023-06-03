@@ -15,7 +15,7 @@ module.exports = {
         const channel = interaction.options.getChannel("channel");
         // if they inputted a channel
         if (channel) {
-            if (!channel.isVoice) {
+            if (!channel.isVoiceBased()) {
                 interaction.reply({
                     content: `Filters are only available on voice channels`,
                     ephemeral: true

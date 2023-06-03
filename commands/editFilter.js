@@ -48,7 +48,7 @@ module.exports = {
             const addOrRemove = interaction.options.getInteger("add_or_remove"); // 1 for add 0 for remove
             const user = interaction.options.getUser("user");
             if (channel) {
-                if (!channel.isVoice) {
+                if (!channel.isVoiceBased()) {
                     interaction.reply({
                         content: `Filters are only available on voice channels`,
                         ephemeral: true
@@ -124,7 +124,7 @@ module.exports = {
             const channel = interaction.options.getChannel("channel");
             const type = interaction.options.getString("filter_type"); // string of either "whitelist" or "blacklist"
             if (channel) {
-                if (!channel.isVoice) {
+                if (!channel.isVoiceBased()) {
                     interaction.reply({
                         content: `Filters are only available on voice channels`,
                         ephemeral: true
