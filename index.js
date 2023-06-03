@@ -61,12 +61,11 @@ client.on('interactionCreate', async interaction => {
 });
 
 client.on('voiceStateUpdate', (oldState, newState) => {
-	// if oldstate channel is not the same as new state (could update because mic and such)
-	// newstate exists
-	// and if the channel has 1 person in it now
-	// and if anyone has signed up for it
-	// for some reason newState can have no channel, so
-	if (oldState && newState && (oldState.channelId == newState.channelId) && newState.channel && data.voiceChats.has(newState.channelId))
+	// first condition is to check if user has joined a channel
+	// second condition is to check if user is joining a new channel
+	// third condition is to check if the channel has a voiceChat object
+	console.log(!oldState, oldState.channelId == newState.channelId);
+	if (newState?.channel && (!oldState || oldState.channelId !== newState.channelId) && data.voiceChats.has(newState.channelId))
 		data.voiceChats.get(newState.channelId).onJoin(newState.member.user);
 });
 
