@@ -12,11 +12,11 @@ const {DiscordUser} = require("./discord-user.js");
 class VoiceChat {
     static voiceChats = new WatcherMap(onModify);
 
-
     /*
         channel is the channel object
         userIds is an array of userIds
-        if overwriteNewUsers is true, then this class will not make new users (only when creating this)
+        if overwriteNewUsers is true, then this class will NEVER make new users
+			Only used when loading from data.js, because the users already exist with data
     */
     constructor (channelId, userIds, overwriteNewUsers) {
         // update channel map
@@ -25,8 +25,8 @@ class VoiceChat {
         this.channelId = channelId;
         this.userIds = new WatcherMap(onModify);
         let userIdsArray = Array.from(userIds);
-        for (let i = 0; i < userIdsArray.length; i ++)
-            this.addUser(userIdsArray[i], overwriteNewUsers);
+        for (const userId of userIdsArray)
+            this.addUser(userId, overwriteNewUsers);
     }
 
     // add a user
@@ -47,11 +47,13 @@ class VoiceChat {
 
     // removes a user
     removeUser (userId) {
-        onModify();
-
         this.userIds.delete(userId);
 
         DiscordUser.users.get(userId).removeVoiceChannel(this.channelId);
+
+		// delete object if no users
+		if (this.userIds.size == 0)
+			VoiceChat.voiceChats.delete(this.channelId);
     }
 
     // returns if it has the user
