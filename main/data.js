@@ -63,53 +63,45 @@ const reviver = (key, value) => {
     return value;
 };
 
-let saving = false;
-let writingVariable = {
-    writing: false, 
-    onFinished: null
-};
-let writing = new Proxy(writingVariable, {
-    set: function (target, key, value) {
-        target[key] = value;
-
-        if (key === "writing" && !value) {
-            try {
-                this.onFinished()
-                console.log("ran function");
-            } catch (error) {
-                // do nothing
-            }
-        }
-    }
-});
+// whether or not data has been updated
+let updated = false;
+let writing = false;
 
 let lastSave = new Date();
 let timeout;
+let onDataFinishWriting;
 const saveData = () => {
-    console.log("saving ...");
-    writing.writing = true;
-    fs.writeFile("./main/data.txt", JSON.stringify(data, replacer), (err) => {
-        if (err) throw err;
-        console.log("data saved");
-        writing.writing = false;
-        // update variables
-        saving = false;
-        lastSave = new Date();
-    });
+    console.log("DO NOT QUIT!!! saving ...");
+    writing = true;
+	try {
+    	fs.writeFileSync("./main/data.txt", JSON.stringify(data, replacer));
+	} catch (err) {
+		console.log("error saving data");
+		throw err;
+	}
+	console.log("data saved");
+	writing = false;
+	// update variables
+	updated = false;
+	lastSave = new Date();
+	
+	// used for exiting the program
+	if (onDataFinishWriting)
+		onDataFinishWriting();
 };
 const onModify = () => {
-    if (!saving) {
+	// if it is already updated, then we don't need to do anything
+    if (!updated) {
+		updated = true;
         if (new Date() - lastSave >= saveCooldown * 1000) // saveCooldown is in seconds
             saveData();
-        else {
+        else
             timeout = setTimeout(saveData, (saveCooldown * 1000) - (new Date() - lastSave));
-            saving = true;
-        }
     }
 };
 const cancelSave = () => {
     clearTimeout(timeout);
-    saving = false;
+    updated = false;
 };
 // set up modify functions
 userOnModifyFunctions.push(onModify);
@@ -125,7 +117,7 @@ if (fs.existsSync('./main/data.txt')) {
 	const storedText = fs.readFileSync('./main/data.txt');
 	if (storedText != "") {
 		JSON.parse(storedText, reviver); // parse text with reviver
-		// NOTE: as the classes are made, they are already set up so storeJSON isn't needed
+		// OnModify is called when each object is created, so we need to cancel the save
 		cancelSave();
 
 		console.log("data succesfully restored from data.txt");
@@ -139,31 +131,34 @@ if (fs.existsSync('./main/data.txt')) {
 else {
 	// creat file
 	fs.writeFileSync('./main/data.txt', "");
+    console.log("data.txt was empty, so data will be reset to default");
     saveData();
-    console.log("data.txt was empty, so data was reset to default");
 }
 
-process.on("beforeExit", () => {
-    // if data is saving, wait for it to be done then shut down
-    if (saving) {
-        // if it is not currently writing, cancel the timeout, and save immediately
-        if (!writing) {
-            cancelSave();
-            saveData();
+// save data when exiting
+[`exit`, `SIGINT`, `SIGUSR1`, `SIGUSR2`, `uncaughtException`, `SIGTERM`].forEach((eventType) => {
+	process.on(eventType, () => {
+		// if data is waiting to be saved, then save immediately if possible
+		if (updated) {
+			// if it is not currently writing, cancel the timeout, and save immediately
+			if (!writing) {
+				cancelSave();
+				saveData();
 
-            // end process
-            process.exit();
-        }
-        else {
-            writing.onFinished = () => {
-                // end process when finished saving
-                process.exit();
-            }
-        }
-    }
+				// end process
+				process.exit();
+			}
+			else {
+				// if we are writing, then wait for it to finish and then exit
+				onDataFinishWriting = () => {
+					process.exit();
+				}
+			}
+		}
 
-    // end process
-    process.exit();
+		// end process
+		process.exit();
+	});
 });
 
 module.exports = {
