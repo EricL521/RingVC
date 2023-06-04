@@ -9,20 +9,13 @@ module.exports = {
         .addChannelOption(option => 
             option.setName('channel')
             .setDescription('Resets this voice channel\'s filter. Leave blank for your global filter')
+			.addChannelTypes(2)
             .setRequired(false)),
 	async execute(data, interaction) {
         const currentUser = interaction.user; // user who started the command
         const channel = interaction.options.getChannel("channel");
         // if they inputted a channel
         if (channel) {
-            if (!channel.isVoiceBased()) {
-                interaction.reply({
-                    content: `Filters are only available on voice channels`,
-                    ephemeral: true
-                });
-                return; // stop the rest of function
-            }
-
             const discordUser = data.users.get(currentUser.id);
             if (!discordUser || !discordUser.hasVoiceChannel(channel.id))
                 interaction.reply({

@@ -24,6 +24,7 @@ module.exports = {
             .addChannelOption(option =>
                 option.setName("channel")
                 .setDescription("Which channel's filter to modify. Leave blank to edit your global filter")
+				.addChannelTypes(2)
                 .setRequired(false)))
         .addSubcommand(subcommand => 
             subcommand.setName("type")
@@ -38,7 +39,8 @@ module.exports = {
                 .setRequired(true))
             .addChannelOption(option =>
                 option.setName("channel")
-                .setDescription("Which channel's filter to modify")
+                .setDescription("Which channel's filter to modify. Leave blank to edit your global filter")
+				.addChannelTypes(2)
                 .setRequired(false))),
 	async execute(data, interaction) {
         // modifying users list
@@ -48,14 +50,6 @@ module.exports = {
             const addOrRemove = interaction.options.getInteger("add_or_remove"); // 1 for add 0 for remove
             const user = interaction.options.getUser("user");
             if (channel) {
-                if (!channel.isVoiceBased()) {
-                    interaction.reply({
-                        content: `Filters are only available on voice channels`,
-                        ephemeral: true
-                    });
-                    return; // stop the rest of function
-                }
-
                 const discordUser = data.users.get(currentUser.id);
                 // if user doesn't exist or hasn't signed up for that voice channel
                 if (!discordUser || !discordUser.hasVoiceChannel(channel.id)) 
