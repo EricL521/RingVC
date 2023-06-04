@@ -36,21 +36,15 @@ module.exports = {
             const voiceChat = data.voiceChats.get(channel.id);
             if (voiceChat.hasUser(user.id)) {
                 voiceChat.removeUser(user.id);
-                interaction.reply({
+                return interaction.reply({
                     content: `You will no lunger be "rung" for <#${channel.id}>`,
                     ephemeral: true
                 });
             }
-            else
-                interaction.reply({
-                    content: `You aren't signed up for <#${channel.id}>`,
-                    ephemeral: true
-                });
         }
-        else
-            interaction.reply({
-                content: `You aren't signed up for <#${channel.id}>`,
-                ephemeral: true
-            });
+		interaction.reply({
+			content: `You aren't signed up for <#${channel.id}>`,
+			ephemeral: true
+		});
 	},
 };
