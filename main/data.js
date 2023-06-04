@@ -71,6 +71,10 @@ let timeout; // used to store timeout for saving during cooldown
 let saved; // a promise that resolves when data is saved
 const saveData = () => {
 	return new Promise((resolve, reject) => {
+		// update variables
+		lastSave = new Date();
+		updated = false;
+
 		console.log("DO NOT QUIT!!! saving ...");
 		try {
 			fs.writeFileSync("./main/data.txt", JSON.stringify(data, replacer));
@@ -79,10 +83,7 @@ const saveData = () => {
 			reject(err);
 			throw err;
 		}
-		console.log("data saved");
-		// update variables
-		updated = false;
-		lastSave = new Date();
+		console.log("data saved. YOU MAY NOW QUIT");
 
 		resolve();
 	});
@@ -138,12 +139,16 @@ else {
 	process.on(eventType, async (err) => {
 		if (err)
 			console.error(err);
+ 
+		// wait for data to be saved
+		await saved;
 
-		// if data is waiting to be saved, then save immediately if possible
-		if (updated)
-			// runs when data is finished saving 
-			await saved;
-		
+		// save immediately if data has been updated
+		if (updated) {
+			cancelSave();
+			await saveData();
+		}
+
 		process.exit(0);
 	});
 });
