@@ -70,7 +70,7 @@ let lastSave = new Date();
 let timeout; // used to store timeout for saving during cooldown
 let saved; // a promise that resolves when data is saved
 const saveData = () => {
-	saved = new Promise((resolve, reject) => {
+	return new Promise((resolve, reject) => {
 		console.log("DO NOT QUIT!!! saving ...");
 		try {
 			fs.writeFileSync("./main/data.txt", JSON.stringify(data, replacer));
@@ -92,9 +92,9 @@ const onModify = () => {
     if (!updated) {
 		updated = true;
         if (new Date() - lastSave >= saveCooldown * 1000) // saveCooldown is in seconds
-            saveData();
+            saved = saveData();
         else
-            timeout = setTimeout(saveData, (saveCooldown * 1000) - (new Date() - lastSave));
+            timeout = setTimeout(() => {saved = saveData()}, (saveCooldown * 1000) - (new Date() - lastSave));
     }
 };
 const cancelSave = () => {
@@ -121,7 +121,7 @@ if (fs.existsSync('./main/data.txt')) {
 		console.log("data succesfully restored from data.txt");
 	}
 	else {
-		saveData();
+		saved = saveData();
 		console.log("data.txt was empty, so data was reset to default");
 	}
 }
