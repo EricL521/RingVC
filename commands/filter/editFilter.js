@@ -93,7 +93,7 @@ module.exports = {
                 if (!discordUser)
                     discordUser = new DiscordUser(currentUser.id, []);
                 else {
-                    const filter = discordUser.globalFilter;
+                    const filter = discordUser.getFilter();
                     if (addOrRemove === 1) {
                         filter.addUser(user.id);
                         interaction.reply({
@@ -161,7 +161,7 @@ module.exports = {
                 if (!discordUser) 
                     discordUser = new DiscordUser(currentUser.id, []); 
                 else {
-                    const filter = discordUser.globalFilter;
+                    const filter = discordUser.getFilter();
                     if (filter.getType() === type)
                         interaction.reply({
                             content: `Your global filter is already a ${type}`,

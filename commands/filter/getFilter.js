@@ -46,7 +46,7 @@ module.exports = {
             if (!discordUser)
                 discordUser = new DiscordUser(currentUser.id, []);
             else {
-                const filter = discordUser.globalFilter;
+                const filter = discordUser.getFilter();
                 let userList = "";
                 filter.getList().forEach((value, key, map) => {
                     userList += `<@${key}>\n`;
