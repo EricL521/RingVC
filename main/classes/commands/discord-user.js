@@ -64,7 +64,17 @@ class DiscordUser {
 	// whether or not a user passes the filter
 	passesFilter(filter, userId) {
 		// if filter doesn't exist, it passes
-		return (!filter || (filter.filter(userId) && this.globalFilter.filter(userId)));
+		return ((!filter || (filter.filter(userId)) && this.globalFilter.filter(userId)));
+	}
+
+	// put a userList through a filter
+	// userList is an array of ids
+	filter(filter, userList) {
+		let filteredList = [];
+		for (let i = 0; i < userList.length; i ++)
+			if (this.passesFilter(filter, userList[i]))
+				filteredList.push(userList[i]);
+		return filteredList;
 	}
 
 	/*
@@ -84,36 +94,30 @@ class DiscordUser {
 		const user = channel.client.users.resolve(this.userId);
 
 		// if user can't join channel
-		if (!channel.permissionsFor(this.userId).has(PermissionsBitField.Flags.Connect))
+		if (!channel.permissionsFor(user.id).has(PermissionsBitField.Flags.Connect))
 			throw new Error(`${user} can't join ${channel}`);
-
-		if (channel.members.has(this.userId)) // if this user is already in the voice chat
+		// if this user is already in the voice chat
+		if (channel.members.has(user.id)) 
 			throw new Error(`${user} is already in ${channel}`);
-
 		// if the new user doesn't pass the filter
 		if (!this.passesFilter(this.getFilter(channel.id), startedUser.id))
 			throw new Error(`you didn't pass ${user}'s filter`);
-
-		if ((isCommand || this.filter(channel.id, Array.from(channel.members.keys()) ).length === 1)) // if the user is the only person who passes the filter 
+		// if the person ringing has blocked the user
+		const startedDiscordUser = DiscordUser.users.get(startedUser.id)
+		if (!startedDiscordUser?.passesFilter(startedDiscordUser.getFilter(channel.id), user.id))
+			throw new Error(`${user} didn't pass YOUR filter`);
+		
+		if (isCommand || this.filter(startedDiscordUser.getFilter(channel.id), 
+			this.filter(this.getFilter(channel.id), 
+			Array.from(channel.members.keys()))).length === 1) // if the user is the only person who passes the filter 
 			return new Promise((resolve) => {
 				channel.send({
 					content: `${user}, ${startedUser} ${message? message: "just joined"} ${channel}`,
 					allowedMentions: {users: [user.id]}
 				})
-				.then(() => resolve())
+				.then(resolve)
 				.catch((err) => {console.error(err); throw new Error(`the message to ${user} failed to send`)});
 			});
-	}
-
-	// put a userList through a filter
-	// userList is an array of ids
-	filter(channelId, userList) {
-		let filteredList = [];
-		const filter = this.getFilter(channelId);
-		for (let i = 0; i < userList.length; i ++)
-			if (this.passesFilter(filter, userList[i]))
-				filteredList.push(userList[i]);
-		return filteredList;
 	}
 
 }
