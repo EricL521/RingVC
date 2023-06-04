@@ -1,7 +1,8 @@
 // data is updated basically in every file
 const {data} = require('./main/data.js');
 
-const fs = require('fs');
+const fs = require('node:fs');
+const path = require('node:path');
 const { Client, Collection, GatewayIntentBits, Partials } = require('discord.js');
 const { token } = require('./config.json');
 
@@ -13,12 +14,26 @@ const client = new Client({
 	partials: [Partials.channel]
 });
 
+// recursive function to get all files in a directory and its subdirectories
+const getFiles = (dir) => {
+	const files = [];
+	const dirents = fs.readdirSync(dir, { withFileTypes: true });
+	for (const dirent of dirents) {
+		const res = path.resolve(dir, dirent.name);
+		if (dirent.isDirectory())
+			files.push(...getFiles(res));
+		else
+			files.push(res);
+	}
+	return files;
+};
 // load commands
 client.commands = new Collection();
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+const folderPath = path.join(__dirname, 'commands');
+const filePaths = getFiles(folderPath).filter(file => file.endsWith('.js'));
 
-for (const file of commandFiles) {
-	const command = require(`./commands/${file}`);
+for (const filePath of filePaths) {
+	const command = require(filePath);
 	// Set a new item in the Collection
 	// With the key as the command name and the value as the exported module
 	client.commands.set(command.data.name, command);
