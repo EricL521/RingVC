@@ -101,11 +101,11 @@ class DiscordUser {
 			throw new Error(`${user} is already in ${channel}`);
 		// if the new user doesn't pass the filter
 		if (!this.passesFilter(this.getFilter(channel.id), startedUser.id))
-			throw new Error(`you didn't pass ${user}'s filter`);
+			throw new Error(`${user} blocked you`);
 		// if the person ringing has blocked the user
 		const startedDiscordUser = DiscordUser.users.get(startedUser.id)
 		if (!startedDiscordUser?.passesFilter(startedDiscordUser.getFilter(channel.id), user.id))
-			throw new Error(`${user} didn't pass YOUR filter`);
+			throw new Error(`you blocked ${user}`);
 		
 		if (isCommand || this.filter(startedDiscordUser.getFilter(channel.id), 
 			this.filter(this.getFilter(channel.id), 
