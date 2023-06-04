@@ -70,7 +70,7 @@ class VoiceChat {
         
         let channel = user.client.channels.resolve(this.channelId);
         this.userIds.forEach((value, key, map) => {
-            DiscordUser.users.get(key).ring(channel, user).catch();
+            DiscordUser.users.get(key).ring(channel, user).catch(err => {/* we don't care */});
         }); 
     }
 }
