@@ -134,23 +134,19 @@ else {
 }
 
 // save data when exiting
-// [`exit`, `SIGINT`, `SIGUSR1`, `SIGUSR2`, `uncaughtException`, `SIGTERM`].forEach((eventType) => {
-// 	process.on(eventType, async (err) => {
-// 		if (err)
-// 			console.error(err);
+[`exit`, `SIGINT`, `SIGUSR1`, `SIGUSR2`, `SIGTERM`].forEach((eventType) => {
+	process.on(eventType, async (err) => {
+		if (err)
+			console.error(err);
 
-// 		// if data is waiting to be saved, then save immediately if possible
-// 		if (updated)
-// 			// runs when data is finished saving 
-// 			return await saved.then(() => {
-// 				// end process
-// 				process.exit();
-// 			});
-
-// 		// end process
-// 		process.exit();
-// 	});
-// });
+		// if data is waiting to be saved, then save immediately if possible
+		if (updated)
+			// runs when data is finished saving 
+			await saved;
+		
+		process.exit(0);
+	});
+});
 
 module.exports = {
     data: data

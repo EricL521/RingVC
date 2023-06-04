@@ -38,7 +38,7 @@ module.exports = {
         })
 		.catch((err) => {
 			interaction.reply({
-				content: `Failed to notify ${user} because ${err}`,
+				content: `Failed to notify ${user} because ${err.message}`,
 				ephemeral: true
 			});
 		});
