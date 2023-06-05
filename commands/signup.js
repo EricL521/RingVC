@@ -34,7 +34,7 @@ module.exports = {
 			// if voice chat already has them
 			if (voiceChat.hasUser(user.id)) {
 				interaction.reply({
-					content: `You are already signed up for <#${channel.id}>. Use /quit to unsignup`,
+					content: `You are already signed up for <#${channel.id}>. Use /unsignup to unsignup`,
 					ephemeral: true
 				});
 				return; // stops the rest of the function
@@ -45,7 +45,7 @@ module.exports = {
 			new VoiceChat(channel.id, [user.id]);
 		
 		interaction.reply({
-			content: `Signed up for <#${channel.id}>. Use /quit to unsignup`,
+			content: `Signed up for <#${channel.id}>. Use /unsignup to unsignup`,
 			ephemeral: true
 		});
 	},

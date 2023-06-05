@@ -2,7 +2,7 @@ const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = re
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('quit')
+		.setName('unsignup')
 		.setDescription('Stop being "rung" for a voice chat')
 		.addChannelOption(option => 
 			option.setName('channel')
