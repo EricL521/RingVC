@@ -39,10 +39,11 @@ for (const filePath of filePaths) {
 	client.commands.set(command.data.name, command);
 }
 
-// When the client is ready, run this code
+// When the client is ready, set status
 client.once('ready', async () => {
 	console.log('Ready');
-})
+	client.user.setPresence({ activities: [{ name: '/help', type: 3 }], status: 'online' });
+});
 client.on('shardError', async () => {
 	console.log('disconnected');
 });
@@ -66,13 +67,6 @@ client.on('interactionCreate', async interaction => {
 		console.error(error);
 		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 	}
-});
-
-// for buttons
-client.on('interactionCreate', async interaction => {
-	if (!interaction.isButton()) return;
-
-	console.log(interaction);
 });
 
 client.on('voiceStateUpdate', (oldState, newState) => {
