@@ -68,7 +68,7 @@ class VoiceChat {
         if (!user.client.channels.resolve(this.channelId))
             await user.client.channels.fetch(this.channelId);
         
-        let channel = user.client.channels.resolve(this.channelId);
+        const channel = user.client.channels.resolve(this.channelId);
         this.userIds.forEach((value, key, map) => {
             DiscordUser.users.get(key).ring(channel, user).catch(err => {/* we don't care */});
         }); 
