@@ -104,10 +104,11 @@ class DiscordUser {
 			throw new Error(`${user} blocked you`);
 		// if the person ringing has blocked the user
 		const startedDiscordUser = DiscordUser.users.get(startedUser.id)
-		if (!startedDiscordUser?.passesFilter(startedDiscordUser.getFilter(channel.id), user.id))
-			throw new Error(`you blocked ${user}`);
+		// if startedDiscordUser doesn't exist, it passes
+		if (startedDiscordUser && !startedDiscordUser.passesFilter(startedDiscordUser.getFilter(channel.id), user.id))
+			throw new Error(`You blocked ${user}`);
 		
-		if (isCommand || this.filter(startedDiscordUser.getFilter(channel.id), 
+		if (isCommand || this.filter(startedDiscordUser?.getFilter(channel.id), 
 			this.filter(this.getFilter(channel.id), 
 			Array.from(channel.members.keys()))).length === 1) // if the user is the only person who passes the filter 
 			return new Promise((resolve) => {
