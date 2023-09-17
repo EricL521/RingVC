@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -16,7 +16,16 @@ module.exports = {
 					{ name: 'Quitting', value: 'Use /quit or /unsignup to stop being rung for a voice channel' },
 					{ name: 'Ringing', value: 'What the bot was named after. Use /ring to ping someone once you\'re in a voice channel' },
 					{ name: 'Blocking people', value: 'Don\'t want to be rung by someone? Use /block to block people, and /unblock to unblock them. *This means you won\'t be pinged if they "start" a voice call*' },
-					{ name: 'Other commands', value: 'Other than the basics above, you can use /edit_filter, /get_filter, and /reset_filter, to manage your filters more in depth'}
+					{ name: 'Other commands', value: 'Other than the basics above, you can use /edit_filter, /get_filter, and /reset_filter, to manage your filters more in depth'},
+					{ name: 'Github', value: 'If you want to host your own version of this bot, report bugs, or just view the code, check out the github below'}
+				)
+			],
+			components: [
+				new ActionRowBuilder().addComponents(
+					new ButtonBuilder()
+					.setLabel('Github')
+					.setStyle(ButtonStyle.Link)
+					.setURL('https://github.com/EricL521/RingVC')
 				)
 			],
 			ephemeral: true 
