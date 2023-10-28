@@ -52,6 +52,7 @@ client.on('shardReconnecting', async () => {
 });
 client.on('shardResume', () => {
 	console.log('reconnected');
+	client.user.setPresence({ activities: [{ name: '/help', type: 3 }], status: 'online' });
 });
 
 client.on('interactionCreate', async interaction => {
