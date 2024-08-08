@@ -78,5 +78,18 @@ client.on('voiceStateUpdate', (oldState, newState) => {
 		data.voiceChats.get(newState.channelId).onJoin(newState.member.user);
 });
 
-// Login to Discord with your client's token
-client.login(token);
+// wait until online to log in
+// otherwise program will error out
+import('is-online').then(({default: isOnline}) => {
+    const check = async () => {
+        console.log("Checking for internet...");
+        if (await isOnline()) {
+            console.log("Online. Connecting to server");
+            client.login(token);
+        } else {
+            console.log("Offline. Checking again in 5 seconds");
+            setTimeout(check, 5000);
+        }
+    };
+    check();
+});
