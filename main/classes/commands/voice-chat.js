@@ -64,6 +64,8 @@ class VoiceChat {
     // on someone joining a call
     // user is the person who just joined the call
     async onJoin (user) {
+        if (!user) return;
+        
         // if the channel cache does not contain the channel 
         if (!user.client.channels.resolve(this.channelId))
             await user.client.channels.fetch(this.channelId);

@@ -74,8 +74,13 @@ client.on('voiceStateUpdate', (oldState, newState) => {
 	// first condition is to check if user has joined a channel
 	// second condition is to check if user is joining a new channel
 	// third condition is to check if the channel has a voiceChat object
-	if (newState?.channel && (!oldState || oldState.channelId !== newState.channelId) && data.voiceChats.has(newState.channelId))
-		data.voiceChats.get(newState.channelId).onJoin(newState.member.user);
+	try {
+		if (newState?.channel && (!oldState || oldState.channelId !== newState.channelId) && data.voiceChats.has(newState.channelId))
+			data.voiceChats.get(newState.channelId).onJoin(newState.member?.user);
+	}
+	catch (error) {
+		console.error(error);
+	}
 });
 
 // wait until online to log in

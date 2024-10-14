@@ -111,13 +111,13 @@ class DiscordUser {
 		if (isCommand || this.filter(startedDiscordUser?.getFilter(channel.id), 
 			this.filter(this.getFilter(channel.id), 
 			Array.from(channel.members.keys()))).length === 1) // if the user is the only person who passes the filter 
-			return new Promise((resolve) => {
+			return new Promise((resolve, reject) => {
 				channel.send({
 					content: `${user}, ${startedUser} ${message? message: "just joined"} ${channel}`,
 					allowedMentions: {users: [user.id]}
 				})
 				.then(resolve)
-				.catch((err) => {console.error(err); throw new Error(`the message to ${user} failed to send`)});
+				.catch(() => { reject(`the message to ${user} failed to send`); });
 			});
 	}
 
