@@ -90,7 +90,6 @@ const saveData = () => {
 	});
 };
 const onModify = () => {
-    console.log("change detected");
 	// if it is already updated, then we don't need to do anything
     if (!updated) {
 		updated = true;
