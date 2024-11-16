@@ -16,6 +16,7 @@ module.exports = {
 					{ name: 'Quitting', value: 'Use /quit or /unsignup to stop being rung for a voice channel' },
 					{ name: 'Ringing', value: 'What the bot was named after. Use /ring to ping someone to join once you\'re in a voice channel' },
 					{ name: 'Blocking people', value: 'Don\'t want to be rung by someone? Use /block to block people, and /unblock to unblock them. *This means you won\'t be pinged if they "start" a voice call, however, once an unblocked person joins, you will be pinged*' },
+					{ name: 'Modes', value: 'Allows you to not ping people when joining a voice channel. Use \'/mode help\' for more info' },
 					{ name: 'Other commands', value: 'Other than the basics above, you can use /edit_filter, /get_filter, and /reset_filter, to manage your filters more in depth'},
 					{ name: 'Github', value: 'If you want to host your own version of this bot, report bugs, or just view the code, check out the github below'}
 				)

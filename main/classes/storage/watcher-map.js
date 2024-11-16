@@ -9,18 +9,21 @@ class WatcherMap extends Map {
     }
 
     set(...args) {
+        const returnVal = super.set(...args);
         this.onModify();
-        return super.set(...args);
+        return returnVal;
     }
 
     delete(...args) {
+        const returnVal = super.delete(...args);
         this.onModify();
-        return super.delete(...args);
+        return returnVal;
     }
 
     get(...args) {
+        const returnVal = super.get(...args);
         this.onGet();
-        return super.get(...args);
+        return returnVal;
     }
 }
 

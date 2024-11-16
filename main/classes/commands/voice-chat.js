@@ -31,12 +31,10 @@ class VoiceChat {
 
     // add a user
     addUser (userId, overwriteNewUsers) {
-        onModify();
-
         if (!overwriteNewUsers) {
             // create new discord user if needed
             if (!DiscordUser.users.has(userId))
-                new DiscordUser(userId, []);
+                new DiscordUser(userId);
             // update discord user
             DiscordUser.users.get(userId).addVoiceChannel(this.channelId);
         }

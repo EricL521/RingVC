@@ -23,7 +23,8 @@ const replacer = (key, value) => {
             value: {
                 userId: value.userId,
                 voiceChannels: value.voiceChannels,
-                globalFilter: value.globalFilter
+                globalFilter: value.globalFilter,
+                mode: value.mode
             }
         };
     else if (value instanceof VoiceChat)
@@ -53,7 +54,7 @@ const reviver = (key, value) => {
                 return map;
             }, new WatcherMap(onModify, null));
         else if (value.dataType === 'DiscordUser') {
-            return new DiscordUser(value.value.userId, value.value.voiceChannels.entries(), value.value.globalFilter);
+            return new DiscordUser(value.value.userId, value.value.voiceChannels.entries(), value.value.globalFilter, value.value.mode);
         }
         else if (value.dataType === 'VoiceChat')
             return new VoiceChat(value.value.channelId, value.value.userIds.keys(), true);
@@ -89,6 +90,7 @@ const saveData = () => {
 	});
 };
 const onModify = () => {
+    console.log("change detected");
 	// if it is already updated, then we don't need to do anything
     if (!updated) {
 		updated = true;

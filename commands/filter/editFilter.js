@@ -85,7 +85,7 @@ module.exports = {
             else {
                 let discordUser = data.users.get(currentUser.id);
                 if (!discordUser)
-                    discordUser = new DiscordUser(currentUser.id, []);
+                    discordUser = new DiscordUser(currentUser.id);
                 else {
                     const filter = discordUser.getFilter();
                     if (addOrRemove === 1) {
@@ -153,7 +153,7 @@ module.exports = {
             else {
                 let discordUser = data.users.get(currentUser.id);
                 if (!discordUser) 
-                    discordUser = new DiscordUser(currentUser.id, []); 
+                    discordUser = new DiscordUser(currentUser.id); 
                 else {
                     const filter = discordUser.getFilter();
                     if (filter.getType() === type)

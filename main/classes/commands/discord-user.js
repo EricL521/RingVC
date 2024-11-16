@@ -1,5 +1,5 @@
 // used for permission flags
-const {PermissionsBitField} = require("discord.js");
+const {PermissionsBitField, GuildMember} = require("discord.js");
 
 // both used to notify data.js
 const onModifyFunctions = [];
@@ -21,25 +21,30 @@ class DiscordUser {
 		voiceChannels is an array of [channelIds, filter] with filter optional
 		globalFilter is an option filter
 	*/
-	constructor (userId, voiceChannels, globalFilter) {
+	constructor (userId, voiceChannels, globalFilter, mode) {
 		// update userMap
 		DiscordUser.users.set(userId, this);
 
 		this.userId = userId;
-		// voice channels is a map with key guildID and values a map of channelIds
+		// voice channels is a map with key channelID and value Filter
 		this.voiceChannels = new WatcherMap(onModify);
-		let voiceChannelsArray = Array.from(voiceChannels);
-		for (let i = 0; i < voiceChannelsArray.length; i ++) 
-			this.addVoiceChannel(voiceChannelsArray[i][0], voiceChannelsArray[i][1]);
+		if (voiceChannels) {
+			let voiceChannelsArray = Array.from(voiceChannels);
+			for (let i = 0; i < voiceChannelsArray.length; i ++) 
+				this.addVoiceChannel(voiceChannelsArray[i][0], voiceChannelsArray[i][1]);
+		}
 		
-		this.globalFilter = globalFilter? globalFilter: new Filter(false, []);
+		this.globalFilter = globalFilter? globalFilter: new Filter(false);
+
+		// store user mode (default normal)
+		this.mode = mode? mode: "normal";
 	}
 
 	// adds a voice channel
 	// an optional filter object
 	addVoiceChannel(channelId, filter) {
 		this.voiceChannels.set(
-			channelId, filter? filter : new Filter(false, [])
+			channelId, filter? filter : new Filter(false)
 		);
 	}
 
@@ -61,7 +66,7 @@ class DiscordUser {
 		return this.globalFilter;
 	}
 
-	// whether or not a user passes the filter
+	// whether or not a user passes the filter (and global filter)
 	passesFilter(filter, userId) {
 		// if filter doesn't exist, it passes
 		return ((!filter || (filter.filter(userId)) && this.globalFilter.filter(userId)));
@@ -75,6 +80,31 @@ class DiscordUser {
 			if (this.passesFilter(filter, userList[i]))
 				filteredList.push(userList[i]);
 		return filteredList;
+	}
+
+	// needs channel to check if user is invisible
+	getRealMode(channel) {
+		// if mode is auto, check if user is invisible
+		if (this.mode === "auto") {
+			const user = channel.guild.members.resolve(this.userId);
+			if (user && user.presence && user.presence.status === "offline") 
+				return "stealth";
+			return "normal";
+		}
+		return this.mode;
+	}
+	getMode() {
+		return this.mode;
+	}
+	setMode(mode) {
+		// only normal, stealth, and auto are valid modes
+		if (mode !== "normal" && mode !== "stealth" && mode !== "auto") return;
+		// if mode doesn't change, don't do anything
+		if (this.mode === mode) return;
+
+		this.mode = mode;
+
+		onModify();
 	}
 
 	/*
@@ -107,6 +137,9 @@ class DiscordUser {
 		// if startedDiscordUser doesn't exist, it passes
 		if (startedDiscordUser && !startedDiscordUser.passesFilter(startedDiscordUser.getFilter(channel.id), user.id))
 			throw new Error(`You blocked ${user}`);
+		// if startedUser is in stealth mode, and not ringing manually, don't send message
+		if (!isCommand && startedDiscordUser && startedDiscordUser.getRealMode(channel) === "stealth")
+			return new Error(`You are in stealth mode`);
 		
 		if (isCommand || this.filter(startedDiscordUser?.getFilter(channel.id), 
 			this.filter(this.getFilter(channel.id), 

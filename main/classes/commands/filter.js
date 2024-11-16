@@ -17,9 +17,11 @@ class Filter {
         this.isWhitelist = isWhitelist;
 
         this.list = new WatcherMap(onModify);
-        let listArray = Array.from(list);
-        for (let i = 0; i < listArray.length; i ++)
-            this.list.set(listArray[i], 0); // value doesn't matter
+        if (list) {
+            let listArray = Array.from(list);
+            for (let i = 0; i < listArray.length; i ++)
+                this.list.set(listArray[i], 0); // value doesn't matter
+        }
     }
 
     // whether or not a user passes the filter
