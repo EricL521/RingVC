@@ -46,13 +46,13 @@ client.once('ready', async () => {
 	client.user.setPresence({ activities: [{ name: '/help', type: 3 }], status: 'online' });
 });
 client.on('shardError', async () => {
-	console.log('disconnected');
+	// console.log('disconnected');
 });
 client.on('shardReconnecting', async () => {
-	console.log('reconnecting');
+	// console.log('reconnecting');
 });
 client.on('shardResume', () => {
-	console.log('reconnected');
+	// console.log('reconnected');
 	client.user.setPresence({ activities: [{ name: '/help', type: 3 }], status: 'online' });
 });
 
