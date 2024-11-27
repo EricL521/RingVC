@@ -22,7 +22,7 @@ To add the bot to your server, click [here](https://discord.com/oauth2/authorize
 	- allows you to switch between auto, normal, and stealth modes
  		- stealth means that you don't ping anyone when "starting" a call
 
-## Self Hosting
+## Self-Hosting
 Guide on hosting the bot yourself
 
 **Prerequisites**
@@ -38,7 +38,7 @@ Guide on hosting the bot yourself
   ```bash
   git clone https://github.com/EricL521/RingVC.git
   ```
-- Enter new folder
+- Enter newly created folder
   ```bash
   cd RingVC
   ```
