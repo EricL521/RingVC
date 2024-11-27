@@ -26,6 +26,7 @@ To add the bot to your server, click [here](https://discord.com/oauth2/authorize
 Guide on hosting the bot yourself
 
 **Prerequisites**
+- Node.js and npm ([installation guide](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm))
 - Have a Discord bot created ([guide](https://discordjs.guide/preparations/setting-up-a-bot-application.html#creating-your-bot))
 - Enable required permissions (for [auto mode](#mode))
 	- Under settings, on the left side, select Bot
@@ -33,7 +34,6 @@ Guide on hosting the bot yourself
 	- Enable Presence Intent
 
 **Installation & Usage**
-- Install node and npm if not already installed ([more info](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm))
 - Clone repository
   ```bash
   git clone https://github.com/EricL521/RingVC.git
