@@ -17,8 +17,8 @@ To add the bot to your server, click [here](https://discord.com/oauth2/authorize
 	- blocks someone, which prevents them from ringing you and makes it so you don't get pinged if they start a call
 - **/unblock**
 	- unblocks someone
-- **/mode**
 <a name="mode"></a>
+- **/mode**
 	- allows you to switch between auto, normal, and stealth modes
  		- stealth means that you don't ping anyone when "starting" a call
 
