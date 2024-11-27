@@ -3,7 +3,7 @@ A discord bot that tries to replicate Group Chat behavior in server Voice Channe
 - Servers can't ring people, like in Group Chats, so bot just pings people in the Voice Channel Text Chats instead
 
 ## Usage
-To add bot to your server, click [here](https://discord.com/oauth2/authorize?client_id=885686322973536267&permissions=2048&integration_type=0&scope=bot+applications.commands)
+To add the bot to your server, click [here](https://discord.com/oauth2/authorize?client_id=885686322973536267&permissions=2048&integration_type=0&scope=bot+applications.commands)
 ### Commands
 - **/help**
 	- A quick description of all the commands
@@ -17,8 +17,8 @@ To add bot to your server, click [here](https://discord.com/oauth2/authorize?cli
 	- blocks someone, which prevents them from ringing you and makes it so you don't get pinged if they start a call
 - **/unblock**
 	- unblocks someone
-<a name="mode"></a>
 - **/mode**
+<a name="mode"></a>
 	- allows you to switch between auto, normal, and stealth modes
  		- stealth means that you don't ping anyone when "starting" a call
 
