@@ -25,7 +25,7 @@ To add the bot to your server, click [here](https://discord.com/oauth2/authorize
 ## Self-Hosting
 Guide on hosting the bot yourself
 
-**Prerequisites**
+### Prerequisites
 - Node.js and npm ([installation guide](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm))
 - Have a Discord bot created ([guide](https://discordjs.guide/preparations/setting-up-a-bot-application.html#creating-your-bot))
 - Enable required permissions (for [auto mode](#mode))
@@ -33,16 +33,19 @@ Guide on hosting the bot yourself
 	- Scroll down to Privileged Gateway Intents
 	- Enable Presence Intent
 
-**Installation & Usage**
+### Installation & Usage
 - Clone repository
+  
   ```bash
   git clone https://github.com/EricL521/RingVC.git
   ```
 - Enter newly created folder
+  
   ```bash
   cd RingVC
   ```
 - Install Node.js packages
+  
   ```bash
   npm install
   ```
@@ -55,6 +58,7 @@ Guide on hosting the bot yourself
   }
   ```
   - Example (with an invalid token; you'll need your own):
+    
     ```JSON
     {
       "token": "MTE4MjM0NTY3ODkwMTIzNDU2.Gh7Kj9.dQw4w9WgXcQ_WxYz1234567890AbCdEfGhIjKlM",
@@ -63,10 +67,12 @@ Guide on hosting the bot yourself
     }
     ```
 - Deploy slash commands
+  
   ```bash
   node deploy-commands.js
   ```
 - Start bot
+  
   ```bash
   node index.js
   ```
