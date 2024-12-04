@@ -49,7 +49,7 @@ Guide on hosting the bot yourself
   ```bash
   npm install
   ```
-- Create config.json in root directory that looks like:
+- Create `config.json` in root directory with the following values:
   ```JSON
   {
     "token": "Your custom Discord bot token",
