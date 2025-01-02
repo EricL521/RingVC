@@ -141,17 +141,19 @@ class DiscordUser {
 		if (!isCommand && startedDiscordUser && startedDiscordUser.getRealMode(channel) === "stealth")
 			return new Error(`You are in stealth mode`);
 		
-		if (isCommand || this.filter(startedDiscordUser?.getFilter(channel.id), 
-			this.filter(this.getFilter(channel.id), 
-			Array.from(channel.members.keys()))).length === 1) // if the user is the only person who passes the filter 
+		if (isCommand || this.filter(
+			startedDiscordUser?.getFilter(channel.id), 
+			this.filter(this.getFilter(channel.id), Array.from(channel.members.keys()))
+		).length === 1) { // if the user is the only person who passes the filter
 			return new Promise((resolve, reject) => {
 				channel.send({
-					content: `${user}, ${startedUser} ${message? message: "just joined"} ${channel}`,
+					content: `${user}, @${channel.guild.members.resolve(startedUser.id).displayName} ${message? message: "just joined"} \`#${channel.name}\``,
 					allowedMentions: {users: [user.id]}
 				})
 				.then(resolve)
 				.catch(() => { reject(`the message to ${user} failed to send`); });
 			});
+		}
 	}
 
 }
