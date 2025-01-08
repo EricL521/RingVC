@@ -20,7 +20,7 @@ module.exports = {
                 interaction.reply({
                     content: `You have not yet signed up for ${channel}`,
                     ephemeral: true
-                });
+                }).catch(console.error);
             else {
                 const filter = discordUser.getFilter(channel.id);
                 let userList = "";
@@ -31,7 +31,7 @@ module.exports = {
                 interaction.reply({
                     content: `__List of people in your ${filter.getType()} for ${channel}__\n${userList? userList: "None"}`,
                     ephemeral: true
-                });
+                }).catch(console.error);
             }
         }
         else {
@@ -48,7 +48,7 @@ module.exports = {
                 interaction.reply({
                     content: `__List of people in your global ${filter.getType()}__\n${userList? userList: "None"}`,
                     ephemeral: true
-                });
+                }).catch(console.error);
             }
         }
 

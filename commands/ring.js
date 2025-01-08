@@ -16,10 +16,10 @@ module.exports = {
         // if channel doesn't exist (user not in call)
         if (!channel) {
             // don't send dm
-            await interaction.reply({
+            interaction.reply({
                 content: `Please join a vc first`,
                 ephemeral: true
-            });
+            }).catch(console.error);
             return;
         }
         
@@ -34,13 +34,13 @@ module.exports = {
 			interaction.reply({
 				content: `Notified ${user}`,
 				ephemeral: true
-			});
+			}).catch(console.error);
         })
 		.catch((err) => {
 			interaction.reply({
 				content: `Can't notify ${user} because ${err.message}`,
 				ephemeral: true
-			});
+			}).catch(console.error);
 		});
 
 	},

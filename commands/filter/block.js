@@ -24,7 +24,7 @@ module.exports = {
 			interaction.reply({
 				content: `${blockedUser} is already blocked`,
 				ephemeral: true
-			});
+			}).catch(console.error);
 			return;
 		}
 		// otherwise, add the user to the global filter
@@ -32,7 +32,7 @@ module.exports = {
 		interaction.reply({
 			content: `${blockedUser} has been blocked`,
 			ephemeral: true
-		});
+		}).catch(console.error);
 
 	},
 };

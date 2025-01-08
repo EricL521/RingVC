@@ -23,7 +23,7 @@ module.exports = {
 				content: `Please select a channel, or run this command in the Voice Channel you want to sign up for`,
 				ephemeral: true,
 				components: [new ActionRowBuilder().addComponents(moreInfo)]
-			});
+			}).catch(console.error);
 			return; // stop the rest of function
 		}
 
@@ -36,7 +36,7 @@ module.exports = {
 				interaction.reply({
 					content: `You are already signed up for <#${channel.id}>. Use /unsignup to unsignup`,
 					ephemeral: true
-				});
+				}).catch(console.error);
 				return; // stops the rest of the function
 			}
 			voiceChat.addUser(user.id);
@@ -47,6 +47,6 @@ module.exports = {
 		interaction.reply({
 			content: `Signed up for <#${channel.id}>. Use /unsignup to unsignup`,
 			ephemeral: true
-		});
+		}).catch(console.error);
 	},
 };

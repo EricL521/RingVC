@@ -56,7 +56,7 @@ module.exports = {
                     interaction.reply({
                         content: `You have not yet signed up for ${channel}`,
                         ephemeral: true
-                    });
+                    }).catch(console.error);
                 else {
                     const filter = discordUser.getFilter(channel.id);
                     if (addOrRemove === 1) {
@@ -64,7 +64,7 @@ module.exports = {
                         interaction.reply({
                             content: `Added ${user} to your ${filter.getType()} for ${channel}`,
                             ephemeral: true
-                        });
+                        }).catch(console.error);
                     }
                     else {
                         if (filter.hasUser(user.id)) {
@@ -72,13 +72,13 @@ module.exports = {
                             interaction.reply({
                                 content: `Removed ${user} from your ${filter.getType()} for ${channel}`,
                                 ephemeral: true
-                            });
+                            }).catch(console.error);
                         }
                         else
                             interaction.reply({
                                 content: `${user} was not in your ${filter.getType()} for ${channel}`,
                                 ephemeral: true
-                            })
+                            }).catch(console.error);
                     }
                 }
             }
@@ -93,7 +93,7 @@ module.exports = {
                         interaction.reply({
                             content: `Added ${user} to your global ${filter.getType()}`,
                             ephemeral: true
-                        });
+                        }).catch(console.error);
                     }
                     else {
                         if (filter.hasUser(user.id)) {
@@ -101,13 +101,13 @@ module.exports = {
                             interaction.reply({
                                 content: `Removed ${user} from your global ${filter.getType()}`,
                                 ephemeral: true
-                            });
+                            }).catch(console.error);
                         }
                         else
                             interaction.reply({
                                 content: `${user} was not in your global ${filter.getType()}`,
                                 ephemeral: true
-                            })
+                            }).catch(console.error);
                     }
                 }
             }
@@ -122,7 +122,7 @@ module.exports = {
                     interaction.reply({
                         content: `Filters are only available on voice channels`,
                         ephemeral: true
-                    });
+                    }).catch(console.error);
                     return; // stop the rest of function
                 }
 
@@ -132,20 +132,20 @@ module.exports = {
                     interaction.reply({
                         content: `You have not yet signed up for ${channel}`,
                         ephemeral: true
-                    });
+                    }).catch(console.error);
                 else {
                     const filter = discordUser.getFilter(channel.id);
                     if (filter.getType() === type)
                         interaction.reply({
                             content: `Your filter for ${channel} is already a ${type}`,
                             ephemeral: true
-                        });
+                        }).catch(console.error);
                     else {
                         filter.setType(type);
                         interaction.reply({
                             content: `Your filter for ${channel} was reset and changed to a ${type}`,
                             ephemeral: true
-                        });
+                        }).catch(console.error);
                     }
 
                 }
@@ -160,13 +160,13 @@ module.exports = {
                         interaction.reply({
                             content: `Your global filter is already a ${type}`,
                             ephemeral: true
-                        });
+                        }).catch(console.error);
                     else {
                         filter.setType(type);
                         interaction.reply({
                             content: `Your global filter was reset and changed to a ${type}`,
                             ephemeral: true
-                        });
+                        }).catch(console.error);
                     }
 
                 }

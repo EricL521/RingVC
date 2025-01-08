@@ -40,7 +40,7 @@ module.exports = {
 					)
 				], 
 				ephemeral: true
-			});
+			}).catch(console.error);
 		}
 		// set mode
 		else if (interaction.options.getSubcommand() === "set") {
@@ -59,7 +59,7 @@ module.exports = {
 					"You will ring all applicable users when you join a voice channel"
 				}`,
 				ephemeral: true
-			});
+			}).catch(console.error);
 		}
 		// get mode
 		else if (interaction.options.getSubcommand() === "get") {
@@ -74,7 +74,7 @@ module.exports = {
 					"You will ring all applicable users when you join a voice channel"
 				}`,
 				ephemeral: true
-			});
+			}).catch(console.error);
 		}
 	},
 };

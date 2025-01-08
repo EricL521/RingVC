@@ -21,7 +21,7 @@ module.exports = {
                 interaction.reply({
                     content: `You have not yet signed up for ${channel}`,
                     ephemeral: true
-                });
+                }).catch(console.error);
             else {
                 const filter = discordUser.getFilter(channel.id);
                 filter.setType("blacklist"); // also resets filter
@@ -29,7 +29,7 @@ module.exports = {
                 interaction.reply({
                     content: `Filter for ${channel} has been reset and is now a ${filter.getType()}`,
                     ephemeral: true
-                });
+                }).catch(console.error);
             }
         }
         else {
@@ -43,7 +43,7 @@ module.exports = {
                 interaction.reply({
                     content: `Your global filter has been reset and is now a ${filter.getType()}`,
                     ephemeral: true
-                });
+                }).catch(console.error);
             }
         }
 

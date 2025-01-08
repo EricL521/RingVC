@@ -36,6 +36,6 @@ module.exports = {
 				)
 			],
 			ephemeral: true 
-		});
+		}).catch(console.error);
 	},
 };

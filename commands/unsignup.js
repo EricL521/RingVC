@@ -21,7 +21,7 @@ module.exports = {
 				content: `Please select a channel, or run this command in the Voice Channel you want to un-sign up for`,
 				ephemeral: true,
 				components: [new ActionRowBuilder().addComponents(moreInfo)]
-			});
+			}).catch(console.error);
 			return; // stop the rest of function
 		}
         
@@ -32,12 +32,12 @@ module.exports = {
                 return interaction.reply({
                     content: `You will no lunger be "rung" for <#${channel.id}>`,
                     ephemeral: true
-                });
+                }).catch(console.error);
             }
         }
 		interaction.reply({
 			content: `You aren't signed up for <#${channel.id}>`,
 			ephemeral: true
-		});
+		}).catch(console.error);
 	},
 };
