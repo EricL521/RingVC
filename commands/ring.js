@@ -29,19 +29,25 @@ module.exports = {
 
         const discordUser = data.users.get(user.id);
         // send the user an invite link to the voice channel or text channel that the interaction creator is in
-        discordUser.ring(channel, interaction.user, "wants you to join", true)
-        .then(() => {
-			interaction.reply({
-				content: `Notified ${user}`,
-				ephemeral: true
-			}).catch(console.error);
-        })
-		.catch((err) => {
-			interaction.reply({
-				content: `Can't notify ${user} because ${err.message}`,
-				ephemeral: true
-			}).catch(console.error);
-		});
-
+        Promise.allSettled([
+            interaction.deferReply({ ephemeral: true }),
+            discordUser.ring(channel, interaction.user, "wants you to join", true),
+        ]).then((results) => {
+            // if deferReply failed, then there isn't a reply to edit
+            if (results[0].status === "rejected") return;
+            // otherwise, edit the reply to update about the ring
+            if (results[1].status === "fulfilled") {
+                interaction.editReply({
+                    content: `Notified ${user}`,
+                    ephemeral: true
+                }).catch(console.error);
+            }
+            else {
+                interaction.editReply({
+                    content: `Can't notify ${user} because ${results[1].reason.message}`,
+                    ephemeral: true
+                }).catch(console.error);
+            }
+        });
 	},
 };
