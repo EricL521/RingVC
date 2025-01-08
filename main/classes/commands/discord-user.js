@@ -136,10 +136,10 @@ class DiscordUser {
 		const startedDiscordUser = DiscordUser.users.get(startedUser.id)
 		// if startedDiscordUser doesn't exist, it passes
 		if (startedDiscordUser && !startedDiscordUser.passesFilter(startedDiscordUser.getFilter(channel.id), user.id))
-			throw new Error(`You blocked ${user}`);
+			throw new Error(`you blocked ${user}`);
 		// if startedUser is in stealth mode, and not ringing manually, don't send message
 		if (!isCommand && startedDiscordUser && startedDiscordUser.getRealMode(channel) === "stealth")
-			return new Error(`You are in stealth mode`);
+			return new Error(`you are in stealth mode`);
 		
 		if (isCommand || this.filter(
 			startedDiscordUser?.getFilter(channel.id), 
