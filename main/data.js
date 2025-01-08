@@ -54,7 +54,8 @@ const reviver = (key, value) => {
                 return map;
             }, new WatcherMap(onModify, null));
         else if (value.dataType === 'DiscordUser') {
-            return new DiscordUser(value.value.userId, value.value.voiceChannels.entries(), value.value.globalFilter, value.value.mode);
+            if (value.value.userId && value.value.voiceChannels && value.value.globalFilter && value.value.mode)
+                return new DiscordUser(value.value.userId, value.value.voiceChannels.entries(), value.value.globalFilter, value.value.mode);
         }
         else if (value.dataType === 'VoiceChat')
             return new VoiceChat(value.value.channelId, value.value.userIds.keys(), true);
