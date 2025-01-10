@@ -11,6 +11,15 @@ module.exports = {
                 .setDescription('Select a user')
                 .setRequired(true)),
 	async execute(data, interaction) {
+        // command must be run in a guild
+        if (!interaction.member) {
+            interaction.reply({
+                content: `This command must be run in a Discord server`,
+                ephemeral: true
+            }).catch(console.error);
+            return;
+        }
+
         const user = interaction.options.getUser('user');
         const channel = interaction.member.voice.channel;
         // if channel doesn't exist (user not in call)
