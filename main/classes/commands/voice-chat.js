@@ -61,17 +61,49 @@ class VoiceChat {
 
 	// on someone joining a call
 	// user is the person who just joined the call
-	async onJoin (user) {
-		if (!user) return;
+	async onJoin (startedUser) {
+		if (!startedUser) return;
 		
 		// if the channel cache does not contain the channel 
-		if (!user.client.channels.resolve(this.channelId))
-			await user.client.channels.fetch(this.channelId);
+		if (!startedUser.client.channels.resolve(this.channelId))
+			await startedUser.client.channels.fetch(this.channelId);
 		
-		const channel = user.client.channels.resolve(this.channelId);
-		this.userIds.forEach((value, key, map) => {
-			DiscordUser.users.get(key).ring(channel, user).catch(err => {/* we don't care */});
-		}); 
+		const channel = startedUser.client.channels.resolve(this.channelId);
+		
+		const startedDiscordUser = DiscordUser.users.get(startedUser.id);
+		// if user is in stealth mode, don't send message
+		if (startedDiscordUser && startedDiscordUser.getRealMode(channel) === "stealth")
+			return;
+
+		Promise.allSettled(
+			Array.from(this.userIds.keys()).map(key => new Promise((resolve, reject) => {
+				const discordUser = DiscordUser.users.get(key);
+				discordUser.shouldRing(channel, startedUser, false).then(async () => {
+					if (discordUser.filter(
+						startedDiscordUser?.getFilter(channel.id), 
+						discordUser.filter(discordUser.getFilter(channel.id), Array.from(channel.members.keys()))
+					).length === 1) { // if the user is the only person who passes the filter
+						resolve(discordUser);
+					} else {
+						reject("User has already been pinged for this call");
+					}
+				}).catch((error) => {
+					reject(error);
+				});
+			}))
+		).then((results) => {
+			const filterResults = results.filter(result => result.status === "fulfilled").map(result => result.value);
+			if (filterResults.length > 0)
+				channel.send({
+					content: `@${channel.guild.members.resolve(startedUser.id).displayName} just joined \`#${channel.name}\`, ${
+						filterResults.length >= 2?
+							`${filterResults.slice(0, filterResults.length - 1).join(", ")} and ${filterResults[filterResults.length - 1]}`
+						: `${filterResults[0]}`
+					}`,
+					allowedMentions: {users: filterResults.map(value => value.userId)}
+				})
+				.catch(console.error);
+		});
 	}
 }
 

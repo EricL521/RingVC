@@ -108,54 +108,54 @@ class DiscordUser {
 	}
 
 	/*
-		* called when a call is started
 		* channel: discordjs object of the channel the person is in
 		* startedUser: discordjs object of the person who started the call / command
-		* message is optional
 		* placed in between the username and the invite
-		* isCommand is a boolean: whether or not the ring is coming from a command
-		* resolves if it sent, and throws an error as the reason why it couldn't send if it didn't send
+		* resolves if should ring, and rejects if not
+		* by default assumes that this is called from /ring command
+		* need to manually check if automatic
 	*/
-	async ring (channel, startedUser, message, isCommand) {
-		// if client is not in guild cache, get fetch from discord
-		if (!channel.guild.members.resolve(this.userId))
-		await channel.guild.members.fetch(this.userId);
-
-		const user = channel.client.users.resolve(this.userId);
-
+	async shouldRing (channel, startedUser) {
 		// if user can't join channel
-		if (!channel.permissionsFor(user.id).has(PermissionsBitField.Flags.Connect))
-			throw new Error(`${user} can't join ${channel}`);
+		if (!channel.permissionsFor(this.userId).has(PermissionsBitField.Flags.Connect))
+			throw new Error(`${this} can't join ${channel}`);
 		// if this user is already in the voice chat
-		if (channel.members.has(user.id)) 
-			throw new Error(`${user} is already in ${channel}`);
+		if (channel.members.has(this.userId)) 
+			throw new Error(`${this} is already in ${channel}`);
 		// if the new user doesn't pass the filter
 		if (!this.passesFilter(this.getFilter(channel.id), startedUser.id))
-			throw new Error(`${user} blocked you`);
+			throw new Error(`${this} blocked you`);
 		// if the person ringing has blocked the user
-		const startedDiscordUser = DiscordUser.users.get(startedUser.id)
+		const startedDiscordUser = DiscordUser.users.get(startedUser.id);
 		// if startedDiscordUser doesn't exist, it passes
-		if (startedDiscordUser && !startedDiscordUser.passesFilter(startedDiscordUser.getFilter(channel.id), user.id))
-			throw new Error(`you blocked ${user}`);
-		// if startedUser is in stealth mode, and not ringing manually, don't send message
-		if (!isCommand && startedDiscordUser && startedDiscordUser.getRealMode(channel) === "stealth")
-			return new Error(`you are in stealth mode`);
-		
-		if (isCommand || this.filter(
-			startedDiscordUser?.getFilter(channel.id), 
-			this.filter(this.getFilter(channel.id), Array.from(channel.members.keys()))
-		).length === 1) { // if the user is the only person who passes the filter
-			return new Promise((resolve, reject) => {
+		if (startedDiscordUser && !startedDiscordUser.passesFilter(startedDiscordUser.getFilter(channel.id), this.userId))
+			throw new Error(`you blocked ${this}`);
+	}
+	/*
+		* called only for /ring command
+		* Calls shouldRing; channel and startedUser are same as for shouldRing
+		* message is the reason that they should join
+		* resolves if it sent, otherwise rejects with an error with the reason why it didn't send
+	*/
+	async ring (channel, startedUser, message) {
+		return new Promise((resolve, reject) => {
+			this.shouldRing(channel, startedUser).then(() => {
 				channel.send({
-					content: `${user}, @${channel.guild.members.resolve(startedUser.id).displayName} ${message? message: "just joined"} \`#${channel.name}\``,
-					allowedMentions: {users: [user.id]}
+					content: `@${channel.guild.members.resolve(startedUser.id).displayName} ${message} \`#${channel.name}\`, ${this}`,
+					allowedMentions: {users: [this.userId]}
 				})
 				.then(resolve)
-				.catch(() => { reject(`the message to ${user} failed to send`); });
+				.catch(() => { reject(`the ring message to ${this} failed to send`); });
+			}).catch((err) => {
+				reject(err);
 			});
-		}
+		});
 	}
 
+	// returns a string that pings this discordUser
+	toString() {
+		return `<@${this.userId}>`;
+	}
 }
 
 module.exports = {
