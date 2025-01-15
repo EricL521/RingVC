@@ -12,57 +12,57 @@ const {Filter, filterOnModifyFunctions} = require('./classes/commands/filter.js'
 
 // stolen from https://stackoverflow.com/questions/29085197/how-do-you-json-stringify-an-es6-map
 const replacer = (key, value) => {
-    if(value instanceof Map)
-        return {
-            dataType: 'Map',
-            value: Array.from(value.entries()), // or with spread: value: [...value]
-        };
-    else if (value instanceof DiscordUser)
-        return {
-            dataType: 'DiscordUser',
-            value: {
-                userId: value.userId,
-                voiceChannels: value.voiceChannels,
-                globalFilter: value.globalFilter,
-                mode: value.mode
-            }
-        };
-    else if (value instanceof VoiceChat)
-        return {
-            dataType: 'VoiceChat',
-            value: {
-                channelId: value.channelId,
-                userIds: value.userIds
-            }
-        };
-    else if (value instanceof Filter)
-        return {
-            dataType: 'VoiceChannelFilter',
-            value: {
-                isWhitelist: value.isWhitelist,
-                list: value.list
-            }
-        };
-    else
-        return value;
+	if(value instanceof Map)
+		return {
+			dataType: 'Map',
+			value: Array.from(value.entries()), // or with spread: value: [...value]
+		};
+	else if (value instanceof DiscordUser)
+		return {
+			dataType: 'DiscordUser',
+			value: {
+				userId: value.userId,
+				voiceChannels: value.voiceChannels,
+				globalFilter: value.globalFilter,
+				mode: value.mode
+			}
+		};
+	else if (value instanceof VoiceChat)
+		return {
+			dataType: 'VoiceChat',
+			value: {
+				channelId: value.channelId,
+				userIds: value.userIds
+			}
+		};
+	else if (value instanceof Filter)
+		return {
+			dataType: 'VoiceChannelFilter',
+			value: {
+				isWhitelist: value.isWhitelist,
+				list: value.list
+			}
+		};
+	else
+		return value;
 };
 const reviver = (key, value) => {
-    if(typeof value === 'object' && value !== null) {
-        if (value.dataType === 'Map')
-            return value.value.reduce((map, object) => {
-                map.set(object[0], object[1]);
-                return map;
-            }, new WatcherMap(onModify, null));
-        else if (value.dataType === 'DiscordUser') {
-            if (value.value.userId && value.value.voiceChannels && value.value.globalFilter && value.value.mode)
-                return new DiscordUser(value.value.userId, value.value.voiceChannels.entries(), value.value.globalFilter, value.value.mode);
-        }
-        else if (value.dataType === 'VoiceChat')
-            return new VoiceChat(value.value.channelId, value.value.userIds.keys(), true);
-        else if (value.dataType === 'VoiceChannelFilter')
-            return new Filter(value.value.isWhitelist, value.value.list.keys());
-    }
-    return value;
+	if(typeof value === 'object' && value !== null) {
+		if (value.dataType === 'Map')
+			return value.value.reduce((map, object) => {
+				map.set(object[0], object[1]);
+				return map;
+			}, new WatcherMap(onModify, null));
+		else if (value.dataType === 'DiscordUser') {
+			if (value.value.userId && value.value.voiceChannels && value.value.globalFilter && value.value.mode)
+				return new DiscordUser(value.value.userId, value.value.voiceChannels.entries(), value.value.globalFilter, value.value.mode);
+		}
+		else if (value.dataType === 'VoiceChat')
+			return new VoiceChat(value.value.channelId, value.value.userIds.keys(), true);
+		else if (value.dataType === 'VoiceChannelFilter')
+			return new Filter(value.value.isWhitelist, value.value.list.keys());
+	}
+	return value;
 };
 
 // whether or not data has been updated
@@ -92,17 +92,17 @@ const saveData = () => {
 };
 const onModify = () => {
 	// if it is already updated, then we don't need to do anything
-    if (!updated) {
+	if (!updated) {
 		updated = true;
-        if (new Date() - lastSave >= saveCooldown * 1000) // saveCooldown is in seconds
-            saved = saveData();
-        else
-            timeout = setTimeout(() => {saved = saveData()}, (saveCooldown * 1000) - (new Date() - lastSave));
-    }
+		if (new Date() - lastSave >= saveCooldown * 1000) // saveCooldown is in seconds
+			saved = saveData();
+		else
+			timeout = setTimeout(() => {saved = saveData()}, (saveCooldown * 1000) - (new Date() - lastSave));
+	}
 };
 const cancelSave = () => {
-    clearTimeout(timeout);
-    updated = false;
+	clearTimeout(timeout);
+	updated = false;
 };
 // set up modify functions
 userOnModifyFunctions.push(onModify);
@@ -110,8 +110,8 @@ voiceChatOnModifyFunctions.push(onModify);
 filterOnModifyFunctions.push(onModify);
 
 const data = {
-    voiceChats: VoiceChat.voiceChats,
-    users: DiscordUser.users,
+	voiceChats: VoiceChat.voiceChats,
+	users: DiscordUser.users,
 };
 // read data.txt
 if (fs.existsSync('./main/data.txt')) { 
@@ -132,8 +132,8 @@ if (fs.existsSync('./main/data.txt')) {
 else {
 	// creat file
 	fs.writeFileSync('./main/data.txt', "");
-    console.log("data.txt was empty, so data will be reset to default");
-    saveData();
+	console.log("data.txt was empty, so data will be reset to default");
+	saveData();
 }
 
 // save data when exiting
@@ -156,5 +156,5 @@ else {
 });
 
 module.exports = {
-    data: data
+	data: data
 };

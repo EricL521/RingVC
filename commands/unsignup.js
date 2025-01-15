@@ -10,9 +10,9 @@ module.exports = {
 				.addChannelTypes(2)
 				.setRequired(false)),
 	async execute(data, interaction) {
-        const channel = interaction.options.getChannel('channel') || interaction.channel;
-        const user = interaction.user;
-        if (!channel.isVoiceBased()) {
+		const channel = interaction.options.getChannel('channel') || interaction.channel;
+		const user = interaction.user;
+		if (!channel.isVoiceBased()) {
 			const moreInfo = new ButtonBuilder()
 				.setLabel('Text Channels in Voice Channels')
 				.setStyle(ButtonStyle.Link)
@@ -24,17 +24,17 @@ module.exports = {
 			}).catch(console.error);
 			return; // stop the rest of function
 		}
-        
-        if (data.voiceChats.has(channel.id)) {
-            const voiceChat = data.voiceChats.get(channel.id);
-            if (voiceChat.hasUser(user.id)) {
-                voiceChat.removeUser(user.id);
-                return interaction.reply({
-                    content: `You will no lunger be "rung" for <#${channel.id}>`,
-                    ephemeral: true
-                }).catch(console.error);
-            }
-        }
+		
+		if (data.voiceChats.has(channel.id)) {
+			const voiceChat = data.voiceChats.get(channel.id);
+			if (voiceChat.hasUser(user.id)) {
+				voiceChat.removeUser(user.id);
+				return interaction.reply({
+					content: `You will no lunger be "rung" for <#${channel.id}>`,
+					ephemeral: true
+				}).catch(console.error);
+			}
+		}
 		interaction.reply({
 			content: `You aren't signed up for <#${channel.id}>`,
 			ephemeral: true

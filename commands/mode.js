@@ -6,12 +6,12 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('mode')
 		.setDescription('Change modes between invis, normal, and auto')
-        .addSubcommand(subcommand =>
-            subcommand.setName("help")
-            .setDescription("Prints some information about what the modes do"))
-        .addSubcommand(subcommand => 
-            subcommand.setName("set")
-            .setDescription("Sets your mode")
+		.addSubcommand(subcommand =>
+			subcommand.setName("help")
+			.setDescription("Prints some information about what the modes do"))
+		.addSubcommand(subcommand => 
+			subcommand.setName("set")
+			.setDescription("Sets your mode")
 			.addStringOption(option =>
 				option.setName("mode")
 					.setDescription("Which mode to switch to")

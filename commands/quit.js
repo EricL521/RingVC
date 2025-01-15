@@ -12,6 +12,6 @@ module.exports = {
 				.addChannelTypes(2)
 				.setRequired(false)),
 	async execute(data, interaction) {
-        unsignup.execute(data, interaction);
+		unsignup.execute(data, interaction);
 	},
 };

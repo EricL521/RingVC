@@ -2,84 +2,84 @@
 const {WatcherMap} = require("../storage/watcher-map.js");
 const onModifyFunctions = [];
 const onModify = () => {
-    for (let i = 0; i < onModifyFunctions.length; i ++)
-        onModifyFunctions[i]();
+	for (let i = 0; i < onModifyFunctions.length; i ++)
+		onModifyFunctions[i]();
 };
 
 // class for whitelist or blacklist
 class Filter {
-    /* 
-        isWhitelist is a boolean
-        list is the whitelist or blacklist
-        list is an array of userIds
-    */
-    constructor(isWhitelist, list) {
-        this.isWhitelist = isWhitelist;
+	/* 
+		isWhitelist is a boolean
+		list is the whitelist or blacklist
+		list is an array of userIds
+	*/
+	constructor(isWhitelist, list) {
+		this.isWhitelist = isWhitelist;
 
-        this.list = new WatcherMap(onModify);
-        if (list) {
-            let listArray = Array.from(list);
-            for (let i = 0; i < listArray.length; i ++)
-                this.list.set(listArray[i], 0); // value doesn't matter
-        }
-    }
+		this.list = new WatcherMap(onModify);
+		if (list) {
+			let listArray = Array.from(list);
+			for (let i = 0; i < listArray.length; i ++)
+				this.list.set(listArray[i], 0); // value doesn't matter
+		}
+	}
 
-    // whether or not a user passes the filter
-    filter(userId) {
-        let listContainsUser = this.list.has(userId);
+	// whether or not a user passes the filter
+	filter(userId) {
+		let listContainsUser = this.list.has(userId);
 
-        // ^ is xor
-        return !(this.isWhitelist ^ listContainsUser);
-    }
-    
+		// ^ is xor
+		return !(this.isWhitelist ^ listContainsUser);
+	}
+	
 
-    // return whitelist or blacklist
-    getType() {
-        return this.isWhitelist? "whitelist": "blacklist";
-    }
+	// return whitelist or blacklist
+	getType() {
+		return this.isWhitelist? "whitelist": "blacklist";
+	}
 
-    // sets the mode for a filter
-    // string "whitelist" or "blacklist", defaults to blacklist
-    // also clears filter
-    setType(type) {
-        this.isWhitelist = (type === "whitelist")? true: false;
+	// sets the mode for a filter
+	// string "whitelist" or "blacklist", defaults to blacklist
+	// also clears filter
+	setType(type) {
+		this.isWhitelist = (type === "whitelist")? true: false;
 
-        this.clearFilter();
+		this.clearFilter();
 
-        // call on modify
-        onModify();
-    }
+		// call on modify
+		onModify();
+	}
 
-    // clears the filter
-    clearFilter() {
-        this.list = new WatcherMap(onModify);
+	// clears the filter
+	clearFilter() {
+		this.list = new WatcherMap(onModify);
 
-        // call onmodify
-        onModify();
-    }
+		// call onmodify
+		onModify();
+	}
 
 
-    // return map of userIds
-    getList() {
-        return this.list;
-    }
+	// return map of userIds
+	getList() {
+		return this.list;
+	}
 
-    // adds a user to the filter
-    addUser(userId) {
-        this.list.set(userId, 0);
-    }
+	// adds a user to the filter
+	addUser(userId) {
+		this.list.set(userId, 0);
+	}
 
-    hasUser(userId) {
-        return this.list.has(userId);
-    }
+	hasUser(userId) {
+		return this.list.has(userId);
+	}
 
-    // removes a user from the filter
-    removeUser(userId) {
-        this.list.delete(userId);
-    }
+	// removes a user from the filter
+	removeUser(userId) {
+		this.list.delete(userId);
+	}
 }
 
 module.exports = {
-    Filter: Filter,
-    filterOnModifyFunctions: onModifyFunctions
+	Filter: Filter,
+	filterOnModifyFunctions: onModifyFunctions
 }
