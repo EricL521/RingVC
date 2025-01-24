@@ -53,7 +53,7 @@ module.exports = {
 			}
 			else {
 				interaction.editReply({
-					content: `Can't notify ${user} because ${results[1].reason.message}`,
+					content: `Can't notify ${user} because ${results[1].reason}`,
 					ephemeral: true
 				}).catch(console.error);
 			}

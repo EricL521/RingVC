@@ -145,9 +145,11 @@ class DiscordUser {
 					allowedMentions: {users: [this.userId]}
 				})
 				.then(resolve)
-				.catch(() => { reject(`the ring message to ${this} failed to send`); });
+				.catch((err) => {
+					reject(`the ring message to ${this} failed to send${err.rawError? ` (\`${err.rawError.message}\`)`: ""}`);
+				});
 			}).catch((err) => {
-				reject(err);
+				reject(err.message);
 			});
 		});
 	}
