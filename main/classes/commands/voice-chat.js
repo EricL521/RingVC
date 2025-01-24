@@ -82,7 +82,9 @@ class VoiceChat {
 					if (discordUser.filter(
 						startedDiscordUser?.getFilter(channel.id), 
 						discordUser.filter(discordUser.getFilter(channel.id), Array.from(channel.members.keys()))
-					).length === 1) { // if the user is the only person who passes the filter
+					).filter(userId => {
+						return DiscordUser.users.get(userId)?.getRealMode(channel) !== "stealth";
+					}).length === 1) { // if the user is the only person who passes the filter
 						resolve(discordUser);
 					} else {
 						reject("User has already been pinged for this call");
