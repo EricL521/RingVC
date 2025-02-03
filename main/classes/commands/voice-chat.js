@@ -104,7 +104,7 @@ class VoiceChat {
 					}`,
 					allowedMentions: {users: filterResults.map(value => value.userId)}
 				})
-				.catch(console.error);
+				.catch(() => {}); // do nothing for now (discord permission error)
 		});
 	}
 }
