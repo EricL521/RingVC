@@ -97,7 +97,7 @@ class VoiceChat {
 			const filterResults = results.filter(result => result.status === "fulfilled").map(result => result.value);
 			if (filterResults.length > 0)
 				channel.send({
-					content: `@${channel.guild.members.resolve(startedUser.id).displayName} just joined \`#${channel.name}\`, ${
+					content: `\`@${channel.guild.members.resolve(startedUser.id).displayName}\` just joined \`#${channel.name}\`, ${
 						filterResults.length >= 2?
 							`${filterResults.slice(0, filterResults.length - 1).join(", ")} and ${filterResults[filterResults.length - 1]}`
 						: `${filterResults[0]}`

@@ -141,7 +141,7 @@ class DiscordUser {
 		return new Promise((resolve, reject) => {
 			this.shouldRing(channel, startedUser).then(() => {
 				channel.send({
-					content: `@${channel.guild.members.resolve(startedUser.id).displayName} ${message} \`#${channel.name}\`, ${this}`,
+					content: `\`@${channel.guild.members.resolve(startedUser.id).displayName}\` ${message} \`#${channel.name}\`, ${this}`,
 					allowedMentions: {users: [this.userId]}
 				})
 				.then(resolve)
