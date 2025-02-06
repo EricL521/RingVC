@@ -31,16 +31,14 @@ module.exports = {
 			}).catch(console.error);
 			return;
 		}
-		
-		// if the user has no object yet
-		if (!data.users.has(user.id))
-			new DiscordUser(user.id, []);
 
+		// NOTE: if discordUser is null, then we call the static ring method
 		const discordUser = data.users.get(user.id);
 		// send the user an invite link to the voice channel or text channel that the interaction creator is in
 		Promise.allSettled([
 			interaction.deferReply({ ephemeral: true }),
-			discordUser.ring(channel, interaction.user, "wants you to join", true),
+			discordUser? discordUser.ring(channel, interaction.user, "wants you to join"):
+				DiscordUser.ring(channel, interaction.user, "wants you to join", user.id)
 		]).then((results) => {
 			// if deferReply failed, then there isn't a reply to edit
 			if (results[0].status === "rejected") return;

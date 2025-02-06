@@ -15,6 +15,41 @@ const {Filter} = require("./filter.js");
 class DiscordUser {
 	static users = new WatcherMap(onModify);
 
+	// static methods for sending a ring message for new users (with default settings)
+	// also used in normal users to avoid repeating code
+	static async shouldRing(channel, startedUser, userId) {
+		// if user can't join channel
+		if (!channel.permissionsFor(userId).has(PermissionsBitField.Flags.Connect))
+			throw `${DiscordUser.toString(userId)} can't join ${channel}`;
+		// if this user is already in the voice chat
+		if (channel.members.has(userId)) 
+			throw `${DiscordUser.toString(userId)} is already in ${channel}`;
+		// if the person ringing has blocked the user
+		const startedDiscordUser = DiscordUser.users.get(startedUser.id);
+		if (startedDiscordUser && !startedDiscordUser.passesFilter(startedDiscordUser.getFilter(channel.id), userId))
+			throw `you blocked ${DiscordUser.toString(userId)}`;
+	}
+	// skipCheck is used if the discordUser is already created, and we already did the checks
+	static ring(channel, startedUser, message, userId, skipCheck) {
+		return new Promise((resolve, reject) => {
+			(
+				skipCheck? Promise.resolve():
+				DiscordUser.shouldRing(channel, startedUser, userId)
+			).then(() => {
+				channel.send({
+					content: `\`@${channel.guild.members.resolve(startedUser.id).displayName}\` ${message} \`#${channel.name}\`, ${DiscordUser.toString(userId)}`,
+					allowedMentions: {users: [userId]}
+				})
+				.then(resolve)
+				.catch((err) => {
+					reject(`the ring message to ${DiscordUser.toString(userId)} failed to send${err.rawError? ` (\`${err.rawError.message}\`)`: ""}`);
+				});
+			}).catch(reject);
+		});
+	}
+	static toString(userId) {
+		return `<@${userId}>`;
+	}
 
 	/*
 		userId is the user id
@@ -69,7 +104,7 @@ class DiscordUser {
 	// whether or not a user passes the filter (and global filter)
 	passesFilter(filter, userId) {
 		// if filter doesn't exist, it passes
-		return ((!filter || (filter.filter(userId)) && this.globalFilter.filter(userId)));
+		return (((!filter || filter.filter(userId)) && this.globalFilter.filter(userId)));
 	}
 
 	// put a userList through a filter
@@ -115,21 +150,15 @@ class DiscordUser {
 		* by default assumes that this is called from /ring command
 		* need to manually check if automatic
 	*/
-	async shouldRing (channel, startedUser) {
-		// if user can't join channel
-		if (!channel.permissionsFor(this.userId).has(PermissionsBitField.Flags.Connect))
-			throw new Error(`${this} can't join ${channel}`);
-		// if this user is already in the voice chat
-		if (channel.members.has(this.userId)) 
-			throw new Error(`${this} is already in ${channel}`);
-		// if the new user doesn't pass the filter
-		if (!this.passesFilter(this.getFilter(channel.id), startedUser.id))
-			throw new Error(`${this} blocked you`);
-		// if the person ringing has blocked the user
-		const startedDiscordUser = DiscordUser.users.get(startedUser.id);
-		// if startedDiscordUser doesn't exist, it passes
-		if (startedDiscordUser && !startedDiscordUser.passesFilter(startedDiscordUser.getFilter(channel.id), this.userId))
-			throw new Error(`you blocked ${this}`);
+	shouldRing (channel, startedUser) {
+		return new Promise(async (resolve, reject) => {
+			// if the new user doesn't pass the filter
+			if (!this.passesFilter(this.getFilter(channel.id), startedUser.id))
+				reject(`${this} blocked you`);
+			DiscordUser.shouldRing(channel, startedUser, this.userId).catch((err) => {
+				reject(err);
+			}).then(resolve);
+		});
 	}
 	/*
 		* called only for /ring command
@@ -137,26 +166,17 @@ class DiscordUser {
 		* message is the reason that they should join
 		* resolves if it sent, otherwise rejects with an error with the reason why it didn't send
 	*/
-	async ring (channel, startedUser, message) {
+	ring (channel, startedUser, message) {
 		return new Promise((resolve, reject) => {
 			this.shouldRing(channel, startedUser).then(() => {
-				channel.send({
-					content: `\`@${channel.guild.members.resolve(startedUser.id).displayName}\` ${message} \`#${channel.name}\`, ${this}`,
-					allowedMentions: {users: [this.userId]}
-				})
-				.then(resolve)
-				.catch((err) => {
-					reject(`the ring message to ${this} failed to send${err.rawError? ` (\`${err.rawError.message}\`)`: ""}`);
-				});
-			}).catch((err) => {
-				reject(err.message);
-			});
+				DiscordUser.ring(channel, startedUser, message, this.userId, true).then(resolve).catch(reject);
+			}).catch(reject);
 		});
 	}
 
 	// returns a string that pings this discordUser
 	toString() {
-		return `<@${this.userId}>`;
+		return DiscordUser.toString(this.userId);
 	}
 }
 
