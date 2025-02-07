@@ -51,6 +51,11 @@ class DiscordUser {
 		return `<@${userId}>`;
 	}
 
+	// returns if user settings are the default, in which case we don't need to store them
+	static isDefault(voiceChannels, globalFilter, mode) {
+		return voiceChannels.size === 0 && globalFilter.getList().size === 0 && mode === "normal";
+	}
+
 	/*
 		userId is the user id
 		voiceChannels is an array of [channelIds, filter] with filter optional

@@ -54,11 +54,14 @@ const reviver = (key, value) => {
 				return map;
 			}, new WatcherMap(onModify, null));
 		else if (value.dataType === 'DiscordUser') {
-			if (value.value.userId && value.value.voiceChannels && value.value.globalFilter && value.value.mode)
+			if (value.value.userId && value.value.voiceChannels && value.value.globalFilter && value.value.mode
+					&& !DiscordUser.isDefault(value.value.voiceChannels, value.value.globalFilter, value.value.mode))
 				return new DiscordUser(value.value.userId, value.value.voiceChannels.entries(), value.value.globalFilter, value.value.mode);
 		}
-		else if (value.dataType === 'VoiceChat')
-			return new VoiceChat(value.value.channelId, value.value.userIds.keys(), true);
+		else if (value.dataType === 'VoiceChat') {
+			if (!VoiceChat.isDefault(value.value.userIds.keys()))
+				return new VoiceChat(value.value.channelId, value.value.userIds.keys(), true);
+		}
 		else if (value.dataType === 'VoiceChannelFilter')
 			return new Filter(value.value.isWhitelist, value.value.list.keys());
 	}
@@ -95,7 +98,7 @@ const onModify = () => {
 	if (!updated) {
 		updated = true;
 		if (new Date() - lastSave >= saveCooldown * 1000) // saveCooldown is in seconds
-			saved = saveData();
+			timeout = setTimeout(() => {saved = saveData()}, 10); // save after a short delay (sometimes multiple things are changed at once)
 		else
 			timeout = setTimeout(() => {saved = saveData()}, (saveCooldown * 1000) - (new Date() - lastSave));
 	}

@@ -12,13 +12,18 @@ const {DiscordUser} = require("./discord-user.js");
 class VoiceChat {
 	static voiceChats = new WatcherMap(onModify);
 
+	// returns if the voice chat is the default, in which case we don't need to store it
+	static isDefault(userIds) {
+		return Array.from(userIds).length === 0;
+	}
+
 	/*
 		channel is the channel object
 		userIds is an array of userIds
-		if overwriteNewUsers is true, then this class will NEVER make new users
+		if skipUserUpdates is true, then this class will NEVER make new users or change existing ones
 			Only used when loading from data.js, because the users already exist with data
 	*/
-	constructor (channelId, userIds, overwriteNewUsers) {
+	constructor (channelId, userIds, skipUserUpdates) {
 		// update channel map
 		VoiceChat.voiceChats.set(channelId, this);
 
@@ -26,12 +31,12 @@ class VoiceChat {
 		this.userIds = new WatcherMap(onModify);
 		let userIdsArray = Array.from(userIds);
 		for (const userId of userIdsArray)
-			this.addUser(userId, overwriteNewUsers);
+			this.addUser(userId, skipUserUpdates);
 	}
 
 	// add a user
-	addUser (userId, overwriteNewUsers) {
-		if (!overwriteNewUsers) {
+	addUser (userId, skipUserUpdates) {
+		if (!skipUserUpdates) {
 			// create new discord user if needed
 			if (!DiscordUser.users.has(userId))
 				new DiscordUser(userId);
