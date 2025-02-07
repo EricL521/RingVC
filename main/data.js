@@ -133,7 +133,7 @@ if (fs.existsSync('./main/data.txt')) {
 }
 // if data.txt doesn't exist
 else {
-	// creat file
+	// create file
 	fs.writeFileSync('./main/data.txt', "");
 	console.log("data.txt was empty, so data will be reset to default");
 	saveData();

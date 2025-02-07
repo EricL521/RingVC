@@ -109,7 +109,7 @@ class DiscordUser {
 	// whether or not a user passes the filter (and global filter)
 	passesFilter(filter, userId) {
 		// if filter doesn't exist, it passes
-		return (((!filter || filter.filter(userId)) && this.globalFilter.filter(userId)));
+		return (!filter || filter.filter(userId)) && this.globalFilter.filter(userId);
 	}
 
 	// put a userList through a filter
