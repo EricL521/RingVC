@@ -81,16 +81,26 @@ const saveData = () => {
 		updated = false;
 
 		console.log("DO NOT QUIT!!! saving ...");
-		try {
-			fs.writeFileSync("./main/data.txt", JSON.stringify(data, replacer));
-		} catch (err) {
-			console.log("error saving data");
-			reject(err);
-			throw err;
-		}
-		console.log("data saved. YOU MAY NOW QUIT");
+		const tempPath = "./main/data.txt.tmp";
+		const finalPath = "./main/data.txt";
 
-		resolve();
+		fs.writeFile(tempPath, JSON.stringify(data, replacer), (err) => {
+			if (err) {
+				console.log("error saving data to temp file");
+				reject(err);
+				return;
+			}
+			
+			fs.rename(tempPath, finalPath, (err) => {
+				if (err) {
+					console.log("error renaming temp file");
+					reject(err);
+					return;
+				}
+				console.log("data saved. YOU MAY NOW QUIT");
+				resolve();
+			});
+		});
 	});
 };
 const onModify = () => {
