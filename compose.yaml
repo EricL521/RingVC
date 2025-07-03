@@ -1,4 +1,4 @@
 services:
-  web:
+  bot:
     build: .
     restart: unless-stopped
