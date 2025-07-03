@@ -26,7 +26,7 @@ To add the bot to your server, click [here](https://discord.com/oauth2/authorize
 Guide on hosting the bot yourself
 
 ### Prerequisites
-- Node.js and npm ([installation guide](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm))
+- Docker Compose ([installation guide](https://docs.docker.com/compose/install/))
 - Have a Discord bot created ([guide](https://discordjs.guide/preparations/setting-up-a-bot-application.html#creating-your-bot))
 - Enable required permissions (for [auto mode](#mode))
 	- Under settings, on the left side, select Bot
@@ -44,15 +44,11 @@ Guide on hosting the bot yourself
   ```bash
   cd RingVC
   ```
-- Install Node.js packages
-  
-  ```bash
-  npm install
-  ```
 - Create `config.json` in root directory with the following values:
   ```JSON
   {
     "token": "Your custom Discord bot token",
+    "clientId": "Your custom Discord bot's client ID"
 
     "saveCooldown": "How often new data should be saved, in seconds"
   }
@@ -62,20 +58,25 @@ Guide on hosting the bot yourself
     ```JSON
     {
       "token": "MTE4MjM0NTY3ODkwMTIzNDU2.Gh7Kj9.dQw4w9WgXcQ_WxYz1234567890AbCdEfGhIjKlM",
+      "clientId": "963163591003628162"
 
       "saveCooldown": "60"
     }
     ```
-- Deploy slash commands
-  
+- Start bot in Docker
+
   ```bash
-  node deploy-commands.js
-  ```
-- Start bot
-  
-  ```bash
-  node index.js
+  docker compose up -d
   ```
 - Invite bot to your server ([guide](https://discordjs.guide/preparations/adding-your-bot-to-servers.html#creating-and-using-your-invite-link))
   - Select `bot`, `applications.commands` and `Send Messages` permissions
+- To stop, run
 
+  ```bash
+  docker compose down
+  ```
+- To update, run
+
+  ```bash
+  docker compose build
+  ```
